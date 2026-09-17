@@ -25,9 +25,19 @@ Loại: [ ] Tối ưu tính năng có sẵn  [x] Tính năng mới cho TA/Học 
      - Học viên Lê Quang Ngọc (E403): *"Cũng gặp vấn đề về việc đưa ra câu hỏi trên discord nhưng bị miss / chưa được trả lời, sau đó cần đi hỏi lại chị TA/mentor."*
      - Lab Coach 1: *"Lần gần nhất câu hỏi học viên chưa được trả lời là 1-2 ngày, đã từng trôi tin của học viên, hậu quả là câu hỏi đó vẫn chưa được giải quyết => bản tin bot tự động mỗi ngày sẽ dùng được để hỗ trợ học viên."*
      - Lab Coach 2: *"Lần gần nhất câu hỏi học viên chưa được trả lời là 1-2 tiếng, đã từng bị trôi mất tin của học viên, hậu quả tương tự (problem của học viên chưa được giải quyết), công nhận tính năng tóm tắt bảng tin AI trên discord là dùng được để hỗ trợ học viên."*
-   - **Bằng chứng phân tích dữ liệu (Đường B — Dữ liệu nội bộ khóa học):**
-     - Phân tích mẫu log thảo luận khóa học qua các mã tin nhắn ẩn danh (`M78683`, `M24366`, `M04103`, `M66718`): Học viên liên tục hỏi về cách mở ticket hoặc được nhắc nhở tạo ticket khi câu hỏi trên kênh chung bị trôi, cho thấy lượng ticket hỗ trợ phát sinh rất lớn nhưng chưa có phân loại ưu tiên.
-     - Phân tích các bản tin bot tự sinh hiện tại của khóa: 100% bản tin bị lỗi chèn chuỗi rác ("nguồn tham chiếu"), câu chữ tóm tắt bị cắt cụt và các thông báo hỗ trợ đều thiếu direct link dẫn tới tin nhắn/ticket gốc.
+      - **Bằng chứng phân tích dữ liệu (Đường B — Khai phá dữ liệu thật từ `data/discord-pack/`):**
+     - *Quy mô mẫu & Phương pháp đếm:* Khảo sát trên 1.092 tin nhắn (779 tin người dùng) trong `k4_messages.csv` và 4 bản tin tự động tại `k4_daily_reports.md`. Phương pháp: Lọc tin nhắn có `is_bot == False`, đếm các tin chứa từ khoá ("ticket", "hỏi", "lỗi", "chưa vào được") và đo độ trễ thời gian chờ xử lý (`reply_to_msg_id`).
+     - *Số liệu đếm được:*
+       - Có 43 tin nhắn/ticket phản ánh lỗi kỹ thuật và thủ tục bị trôi dạt từ 2–4 tiếng (thậm chí qua đêm) không có người phản hồi.
+       - Nhiều học viên liên tục phải hỏi cách mở ticket hoặc nhắn tin hối thúc do câu hỏi trên kênh chung bị trôi.
+       - Phân tích 4 bản tin bot tự động đang chạy: 100% (4/4 bản tin) hoàn toàn thiếu direct link dẫn tới tin nhắn/ticket gốc; bản tin ngày 14/09 bị lỗi thuật toán chèn chuỗi rác ("nguồn tham chiếu...") tới 9 lần; bản tin ngày 13/09 bị cắt cụt chữ ở cuối ("Một số câu hỏi chưa được giải đá").
+     - *≥5 trích dẫn nguyên văn tiêu biểu (kèm mã tin xác thực):*
+       1. `M57545` (channel_02): *"Dạ phoenix vẫn đang báo mail của em bị sai tài khoản github ạ"* — Lỗi hệ thống lab nghiêm trọng, học viên hoang mang chờ ticket được xử lý.
+       2. `M53930` (channel_02): *"Hiện tại em vẫn chưa vào được phoenix ạ"* — Học viên phải nhắn lặp lại liên tiếp sau 1 phút vì ticket chưa có TA tiếp nhận.
+       3. `M45903` (channel_02): *"cho em hỏi là bao giờ có thẻ học viên vậy ạ"* — Thắc mắc thủ tục bị trôi, chỉ có bạn khác vào trả lời trêu đùa, không có phản hồi chính thức từ TA.
+       4. `M88368` (channel_02): *"Cho em hỏi là thành viên team 4-5 người... sẽ giữ nguyên hay random thêm..."* — Câu hỏi chính sách quan trọng bị chìm giữa các luồng chat.
+       5. `M78683`: *"Mọi người ơi cho em hỏi mở ticket ở kênh nào để báo lỗi CVAT với ạ?"* — Học viên lúng túng vì kênh chung bị trôi tin phải tìm đường tạo ticket hỗ trợ.
+
 
 ## §2. Impact & quyết định chọn
 - **Bảng impact 3 ứng viên:**
