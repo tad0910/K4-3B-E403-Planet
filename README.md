@@ -8,10 +8,10 @@
 
 | Họ và Tên | Mã Học Viên | Vai trò chính | Phần việc đảm nhiệm trong dự án |
 |---|---|---|---|
-|  |  | Đội trưởng (Mã nộp bài) |  |
-|  |  | Thành viên |  |
-|  |  | Thành viên |  |
-|  |  | Thành viên |  |
+| Lục Tiến Đạt | 2A202602969 | Đội trưởng (Mã nộp bài) | Quản lý tiến độ, AI Spec, Prompt & Code |
+| Đinh Kim Thái | 2A202602417 | Thành viên | Mining Data, Evidence & Testing |
+| Lê Công Tâm | 2A202602406 | Thành viên | UI/UX Flow, Prototype Mock |
+| Nguyễn Thành Tiến | 2A202603003 | Thành viên | Golden set, Validation & Slide |
 
 > Nhóm copy nguyên file README này về repo của mình, rồi điền bảng trên. Cột **Phần việc đảm nhiệm** ghi càng cụ thể càng tốt.
 
