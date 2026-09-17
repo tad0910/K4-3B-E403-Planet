@@ -1,0 +1,807 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Discord TA Control Panel — K4-3B-E403-Planet</title>
+    <!-- Google Fonts: Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-darkest: #1e1f22;
+            --bg-sidebar: #2b2d31;
+            --bg-chat: #313338;
+            --bg-card: #2b2d31;
+            --bg-card-hover: #35373c;
+            --accent-blurple: #5865f2;
+            --accent-blurple-hover: #4752c4;
+            --danger-red: #f23f43;
+            --danger-bg: rgba(242, 63, 67, 0.15);
+            --warning-yellow: #f0b232;
+            --warning-bg: rgba(240, 178, 50, 0.15);
+            --success-green: #23a55a;
+            --success-bg: rgba(35, 165, 90, 0.15);
+            --text-primary: #f2f3f5;
+            --text-secondary: #b5bac1;
+            --text-muted: #949ba4;
+            --border-subtle: #3f4147;
+            --radius-sm: 6px;
+            --radius-md: 10px;
+            --radius-lg: 16px;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-darkest);
+            color: var(--text-primary);
+            height: 100vh;
+            display: flex;
+            overflow: hidden;
+        }
+
+        /* Server Sidebar */
+        .server-sidebar {
+            width: 72px;
+            background-color: var(--bg-darkest);
+            padding: 12px 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+            border-right: 1px solid var(--border-subtle);
+        }
+
+        .server-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #5865f2, #eb459e);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 800;
+            font-size: 18px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            box-shadow: 0 4px 12px rgba(88, 101, 242, 0.3);
+        }
+
+        .server-icon:hover {
+            border-radius: 16px;
+        }
+
+        /* Channel Sidebar */
+        .channel-sidebar {
+            width: 240px;
+            background-color: var(--bg-sidebar);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .server-header {
+            height: 52px;
+            padding: 0 16px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            font-weight: 700;
+            font-size: 15px;
+            border-bottom: 1px solid rgba(0,0,0,0.2);
+            box-shadow: 0 1px 2px rgba(0,0,0,0.2);
+        }
+
+        .channel-list {
+            padding: 12px 8px;
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .channel-category {
+            font-size: 11px;
+            font-weight: 700;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            padding: 8px 8px 4px;
+            letter-spacing: 0.5px;
+        }
+
+        .channel-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 8px 10px;
+            border-radius: var(--radius-sm);
+            color: var(--text-secondary);
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            text-decoration: none;
+            transition: all 0.15s ease;
+        }
+
+        .channel-item:hover {
+            background-color: rgba(255,255,255,0.06);
+            color: var(--text-primary);
+        }
+
+        .channel-item.active {
+            background-color: rgba(255,255,255,0.1);
+            color: var(--text-primary);
+        }
+
+        .channel-item .name {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .badge {
+            background-color: var(--danger-red);
+            color: white;
+            font-size: 11px;
+            font-weight: 700;
+            padding: 2px 7px;
+            border-radius: 10px;
+        }
+
+        /* Main Content */
+        .main-content {
+            flex: 1;
+            background-color: var(--bg-chat);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .top-bar {
+            height: 52px;
+            padding: 0 20px;
+            border-bottom: 1px solid var(--border-subtle);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background-color: var(--bg-chat);
+        }
+
+        .top-title {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-weight: 700;
+            font-size: 16px;
+        }
+
+        .status-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: rgba(35, 165, 90, 0.15);
+            color: var(--success-green);
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background-color: var(--success-green);
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.4; }
+            100% { opacity: 1; }
+        }
+
+        .dashboard-container {
+            flex: 1;
+            overflow-y: auto;
+            padding: 24px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        /* Metrics Row */
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 16px;
+        }
+
+        .metric-card {
+            background-color: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            padding: 16px 20px;
+            border-radius: var(--radius-md);
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .metric-title {
+            font-size: 12px;
+            color: var(--text-muted);
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .metric-value {
+            font-size: 26px;
+            font-weight: 800;
+        }
+
+        .metric-value.urgent {
+            color: var(--danger-red);
+        }
+
+        .metric-value.success {
+            color: var(--success-green);
+        }
+
+        /* Control Filter Bar */
+        .filter-bar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            background-color: var(--bg-card);
+            padding: 12px 16px;
+            border-radius: var(--radius-md);
+            border: 1px solid var(--border-subtle);
+        }
+
+        .filter-group {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .filter-btn {
+            background: transparent;
+            border: 1px solid var(--border-subtle);
+            color: var(--text-secondary);
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.15s ease;
+        }
+
+        .filter-btn:hover, .filter-btn.active {
+            background-color: var(--accent-blurple);
+            color: white;
+            border-color: var(--accent-blurple);
+        }
+
+        .btn-primary {
+            background-color: var(--accent-blurple);
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: var(--radius-sm);
+            font-weight: 600;
+            font-size: 13px;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            transition: background 0.2s ease;
+        }
+
+        .btn-primary:hover {
+            background-color: var(--accent-blurple-hover);
+        }
+
+        /* Ticket Feed List */
+        .ticket-feed {
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+        }
+
+        .ticket-card {
+            background-color: var(--bg-card);
+            border: 1px solid var(--border-subtle);
+            border-left: 4px solid var(--accent-blurple);
+            border-radius: var(--radius-md);
+            padding: 18px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            transition: transform 0.15s ease, box-shadow 0.15s ease;
+        }
+
+        .ticket-card:hover {
+            background-color: var(--bg-card-hover);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba(0,0,0,0.2);
+        }
+
+        .ticket-card.urgent {
+            border-left-color: var(--danger-red);
+            background: linear-gradient(90deg, rgba(242, 63, 67, 0.05), var(--bg-card) 30%);
+        }
+
+        .ticket-card.warning {
+            border-left-color: var(--warning-yellow);
+        }
+
+        .ticket-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .ticket-meta {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .user-avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background-color: #5865f2;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 14px;
+            color: white;
+        }
+
+        .user-info {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .user-name {
+            font-size: 14px;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+
+        .ticket-time {
+            font-size: 12px;
+            color: var(--text-muted);
+        }
+
+        .tag-pill {
+            font-size: 11px;
+            font-weight: 700;
+            padding: 4px 10px;
+            border-radius: 12px;
+            text-transform: uppercase;
+        }
+
+        .tag-pill.urgent {
+            background-color: var(--danger-bg);
+            color: var(--danger-red);
+            border: 1px solid rgba(242, 63, 67, 0.3);
+        }
+
+        .tag-pill.warning {
+            background-color: var(--warning-bg);
+            color: var(--warning-yellow);
+        }
+
+        .tag-pill.success {
+            background-color: var(--success-bg);
+            color: var(--success-green);
+        }
+
+        .ticket-title {
+            font-size: 15px;
+            font-weight: 700;
+            color: #ffffff;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .ticket-ai-summary {
+            background-color: rgba(0,0,0,0.2);
+            border-radius: var(--radius-sm);
+            padding: 12px 14px;
+            font-size: 13px;
+            line-height: 1.5;
+            color: var(--text-secondary);
+            border: 1px dashed var(--border-subtle);
+        }
+
+        .ticket-ai-summary strong {
+            color: #5865f2;
+        }
+
+        .ticket-actions {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding-top: 6px;
+        }
+
+        .direct-link-btn {
+            background-color: rgba(88, 101, 242, 0.15);
+            color: #5865f2;
+            border: 1px solid rgba(88, 101, 242, 0.4);
+            padding: 8px 14px;
+            border-radius: var(--radius-sm);
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            text-decoration: none;
+            transition: all 0.15s ease;
+        }
+
+        .direct-link-btn:hover {
+            background-color: var(--accent-blurple);
+            color: white;
+        }
+
+        .action-btns {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-secondary {
+            background-color: #3b3e45;
+            color: var(--text-primary);
+            border: none;
+            padding: 8px 14px;
+            border-radius: var(--radius-sm);
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.15s ease;
+        }
+
+        .btn-secondary:hover {
+            background-color: #4e5058;
+        }
+
+        .btn-success {
+            background-color: var(--success-green);
+            color: white;
+            border: none;
+            padding: 8px 14px;
+            border-radius: var(--radius-sm);
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        .btn-success:hover {
+            background-color: #1f8b4c;
+        }
+
+        /* Toast notification */
+        .toast {
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            background-color: var(--bg-sidebar);
+            border: 1px solid var(--accent-blurple);
+            color: white;
+            padding: 14px 20px;
+            border-radius: var(--radius-md);
+            font-size: 14px;
+            font-weight: 600;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            display: none;
+            animation: slideUp 0.3s ease;
+            z-index: 100;
+        }
+
+        @keyframes slideUp {
+            from { transform: translateY(20px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Server Sidebar -->
+    <div class="server-sidebar">
+        <div class="server-icon" title="K4 · AI20K Build Phase">AI</div>
+    </div>
+
+    <!-- Channel Sidebar -->
+    <div class="channel-sidebar">
+        <div class="server-header">
+            <span>K4 · Lớp 3B · E403</span>
+            <span style="font-size: 12px; color: var(--text-muted);">▼</span>
+        </div>
+        <div class="channel-list">
+            <div class="channel-category">Hỗ trợ & Thảo luận</div>
+            <a href="#" class="channel-item">
+                <span class="name"># general-chat</span>
+            </a>
+            <a href="#" class="channel-item">
+                <span class="name"># thac-mac-lab</span>
+            </a>
+            
+            <div class="channel-category" style="margin-top: 12px;">TA Dashboard (B2)</div>
+            <a href="#" class="channel-item active">
+                <span class="name">🚨 #ta-missed-ticket-alert</span>
+                <span class="badge" id="badge-count">4</span>
+            </a>
+            <a href="#" class="channel-item">
+                <span class="name">📊 #smart-daily-digest</span>
+            </a>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content">
+        <div class="top-bar">
+            <div class="top-title">
+                <span>🚨 #ta-missed-ticket-alert</span>
+                <span style="color: var(--text-muted); font-size: 14px;">| Bảng điều khiển Ticket bị bỏ sót & Cảnh báo khẩn cấp cho TA</span>
+            </div>
+            <div class="status-pill">
+                <span class="status-dot"></span>
+                <span>AI Agent: Active (Quét mỗi 30p)</span>
+            </div>
+        </div>
+
+        <div class="dashboard-container">
+            <!-- Metrics Row -->
+            <div class="metrics-grid">
+                <div class="metric-card">
+                    <span class="metric-title">Tổng Ticket đang mở</span>
+                    <span class="metric-value" id="stat-total">14</span>
+                </div>
+                <div class="metric-card">
+                    <span class="metric-title">Ticket bị MISS (>2h)</span>
+                    <span class="metric-value urgent" id="stat-missed">4</span>
+                </div>
+                <div class="metric-card">
+                    <span class="metric-title">Đã hỗ trợ hôm nay</span>
+                    <span class="metric-value success">18</span>
+                </div>
+                <div class="metric-card">
+                    <span class="metric-title">Thời gian phản hồi TB</span>
+                    <span class="metric-value" style="color: #5865f2;">15 phút</span>
+                </div>
+            </div>
+
+            <!-- Filter & Action Bar -->
+            <div class="filter-bar">
+                <div class="filter-group">
+                    <span style="font-size: 13px; font-weight: 700; color: var(--text-muted); margin-right: 6px;">LỌC TICKET:</span>
+                    <button class="filter-btn active" onclick="filterTickets('all', this)">Tất cả (4)</button>
+                    <button class="filter-btn" onclick="filterTickets('urgent', this)">🚨 Cảnh báo MISS (>2h)</button>
+                    <button class="filter-btn" onclick="filterTickets('cvat', this)">💻 Lỗi CVAT / Môi trường</button>
+                    <button class="filter-btn" onclick="filterTickets('logistics', this)">📋 Logistics / Deadline</button>
+                </div>
+                <button class="btn-primary" onclick="triggerAIScan()">
+                    <span>🔄 Quét lại ngay (AI Trigger)</span>
+                </button>
+            </div>
+
+            <!-- Ticket Cards Feed -->
+            <div class="ticket-feed" id="ticket-feed">
+
+                <!-- Ticket Card 1 (MISS GẤP) -->
+                <div class="ticket-card urgent" data-category="urgent cvat" id="ticket-42">
+                    <div class="ticket-header">
+                        <div class="ticket-meta">
+                            <div class="user-avatar" style="background-color: #e91e63;">HV</div>
+                            <div class="user-info">
+                                <span class="user-name">Học viên S4019 (Lớp 3B)</span>
+                                <span class="ticket-time">Ticket #ticket-042 mở lúc 15:30 (Chờ 3 giờ 40 phút)</span>
+                            </div>
+                        </div>
+                        <span class="tag-pill urgent">🚨 MISS GẤP (Chờ > 3 tiếng)</span>
+                    </div>
+
+                    <div class="ticket-title">
+                        <span>💻 [CVAT - Lỗi 500 Health Check OPA Migration]</span>
+                    </div>
+
+                    <div class="ticket-ai-summary">
+                        🤖 <strong>AI Tóm tắt cho TA:</strong> Học viên bị kẹt ở Bước 3 khi khởi chạy CVAT, OPA chưa pull được policy bundle gây lỗi 500. Học viên chưa gửi file log. <br>
+                        👉 <strong>Hành động gợi ý cho TA:</strong> Nhắc học viên chờ 2-3 phút cho DB migration xong, hoặc yêu cầu gửi file log <code>docker-compose logs</code>.
+                    </div>
+
+                    <div class="ticket-actions">
+                        <a href="#" class="direct-link-btn" onclick="openDirectLink('ticket-042', 'S4019'); return false;">
+                            <span>🔗 Mở Direct Link Ticket #ticket-042</span>
+                        </a>
+                        <div class="action-btns">
+                            <button class="btn-secondary" onclick="sendAIReply('ticket-42', 'Gửi hướng dẫn chờ OPA Migration')">⚡ Gửi AI Rep Mẫu</button>
+                            <button class="btn-success" onclick="resolveTicket('ticket-42')">✅ Đã Xử Lý</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Ticket Card 2 (MISS GẤP - Logistics) -->
+                <div class="ticket-card urgent" data-category="urgent logistics" id="ticket-45">
+                    <div class="ticket-header">
+                        <div class="ticket-meta">
+                            <div class="user-avatar" style="background-color: #9c27b0;">HV</div>
+                            <div class="user-info">
+                                <span class="user-name">Học viên S4208 (Lớp 3B)</span>
+                                <span class="ticket-time">Ticket #ticket-045 mở lúc 16:15 (Chờ 2 giờ 55 phút)</span>
+                            </div>
+                        </div>
+                        <span class="tag-pill urgent">🚨 MISS GẤP (Chờ 2h55m)</span>
+                    </div>
+
+                    <div class="ticket-title">
+                        <span>⏰ [Gia hạn Nộp Lab 2 - Lỗi Commit muộn 1 phút]</span>
+                    </div>
+
+                    <div class="ticket-ai-summary">
+                        🤖 <strong>AI Tóm tắt cho TA:</strong> Học viên đẩy commit lên GitHub đúng 23:59 nhưng VLearn khóa nộp lúc 00:00. Học viên xin gia hạn hoặc xác nhận mức trừ điểm nộp muộn. <br>
+                        👉 <strong>Hành động gợi ý cho TA:</strong> Hướng dẫn học viên gửi ticket vlearn-support hoặc kiểm tra timestamp commit trên GitHub.
+                    </div>
+
+                    <div class="ticket-actions">
+                        <a href="#" class="direct-link-btn" onclick="openDirectLink('ticket-045', 'S4208'); return false;">
+                            <span>🔗 Mở Direct Link Ticket #ticket-045</span>
+                        </a>
+                        <div class="action-btns">
+                            <button class="btn-secondary" onclick="sendAIReply('ticket-45', 'Gửi quy định nộp muộn chính thức')">⚡ Gửi AI Rep Mẫu</button>
+                            <button class="btn-success" onclick="resolveTicket('ticket-45')">✅ Đã Xử Lý</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Ticket Card 3 (Cảnh báo Trung bình) -->
+                <div class="ticket-card warning" data-category="cvat" id="ticket-48">
+                    <div class="ticket-header">
+                        <div class="ticket-meta">
+                            <div class="user-avatar" style="background-color: #00bcd4;">HV</div>
+                            <div class="user-info">
+                                <span class="user-name">Học viên S4112 (Lớp 3B)</span>
+                                <span class="ticket-time">Ticket #ticket-048 mở lúc 18:10 (Chờ 1 giờ 10 phút)</span>
+                            </div>
+                        </div>
+                        <span class="tag-pill warning">🟡 ƯU TIÊN TRUNG BÌNH</span>
+                    </div>
+
+                    <div class="ticket-title">
+                        <span>🖼️ [Dữ liệu gán nhãn CVAT - Tự tìm hay được cấp?]</span>
+                    </div>
+
+                    <div class="ticket-ai-summary">
+                        🤖 <strong>AI Tóm tắt cho TA:</strong> Học viên thắc mắc bộ ảnh gán nhãn bài lab CVAT chương trình sẽ cấp hay phải tự thu thập. <br>
+                        👉 <strong>Hành động gợi ý cho TA:</strong> Xác nhận ảnh đã được cấp sẵn trong thư mục <code>data/vlearn-pack/</code>.
+                    </div>
+
+                    <div class="ticket-actions">
+                        <a href="#" class="direct-link-btn" onclick="openDirectLink('ticket-048', 'S4112'); return false;">
+                            <span>🔗 Mở Direct Link Ticket #ticket-048</span>
+                        </a>
+                        <div class="action-btns">
+                            <button class="btn-secondary" onclick="sendAIReply('ticket-48', 'Gửi link folder ảnh cấp sẵn')">⚡ Gửi AI Rep Mẫu</button>
+                            <button class="btn-success" onclick="resolveTicket('ticket-48')">✅ Đã Xử Lý</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Ticket Card 4 (Logistics - Thiếu thông tin) -->
+                <div class="ticket-card warning" data-category="logistics" id="ticket-50">
+                    <div class="ticket-header">
+                        <div class="ticket-meta">
+                            <div class="user-avatar" style="background-color: #ff9800;">HV</div>
+                            <div class="user-info">
+                                <span class="user-name">Học viên S4301 (Lớp 3B)</span>
+                                <span class="ticket-time">Ticket #ticket-050 mở lúc 18:40 (Chờ 40 phút)</span>
+                            </div>
+                        </div>
+                        <span class="tag-pill warning">🟡 CẦN THÊM THÔNG TIN</span>
+                    </div>
+
+                    <div class="ticket-title">
+                        <span>❓ [Ghép đội tự do - Hạn chót kết thúc sớm]</span>
+                    </div>
+
+                    <div class="ticket-ai-summary">
+                        🤖 <strong>AI Tóm tắt cho TA:</strong> Học viên chưa tìm đủ 4 đồng đội, thắc mắc hệ thống có tự động ghép nhóm ngẫu nhiên không. <br>
+                        👉 <strong>Hành động gợi ý cho TA:</strong> Nhắc học viên đăng tin tìm đồng đội trên kênh #tim-teammate trước 21h00.
+                    </div>
+
+                    <div class="ticket-actions">
+                        <a href="#" class="direct-link-btn" onclick="openDirectLink('ticket-050', 'S4301'); return false;">
+                            <span>🔗 Mở Direct Link Ticket #ticket-050</span>
+                        </a>
+                        <div class="action-btns">
+                            <button class="btn-secondary" onclick="sendAIReply('ticket-50', 'Gửi hướng dẫn ghép team ngẫu nhiên')">⚡ Gửi AI Rep Mẫu</button>
+                            <button class="btn-success" onclick="resolveTicket('ticket-50')">✅ Đã Xử Lý</button>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Component -->
+    <div class="toast" id="toast">Lệnh đã thực thi thành công!</div>
+
+    <script>
+        let missedCount = 4;
+        let totalCount = 14;
+
+        function showToast(msg) {
+            const toast = document.getElementById('toast');
+            toast.innerText = msg;
+            toast.style.display = 'block';
+            setTimeout(() => {
+                toast.style.display = 'none';
+            }, 3000);
+        }
+
+        function filterTickets(category, btn) {
+            const btns = document.querySelectorAll('.filter-btn');
+            btns.forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+
+            const cards = document.querySelectorAll('.ticket-card');
+            cards.forEach(card => {
+                if (category === 'all') {
+                    card.style.display = 'flex';
+                } else {
+                    const cats = card.getAttribute('data-category');
+                    if (cats && cats.includes(category)) {
+                        card.style.display = 'flex';
+                    } else {
+                        card.style.display = 'none';
+                    }
+                }
+            });
+        }
+
+        function resolveTicket(cardId) {
+            const card = document.getElementById(cardId);
+            if (card) {
+                card.style.opacity = '0.4';
+                card.style.transform = 'scale(0.98)';
+                setTimeout(() => {
+                    card.style.display = 'none';
+                    missedCount = Math.max(0, missedCount - 1);
+                    totalCount = Math.max(0, totalCount - 1);
+                    document.getElementById('badge-count').innerText = missedCount;
+                    document.getElementById('stat-missed').innerText = missedCount;
+                    document.getElementById('stat-total').innerText = totalCount;
+                    showToast('🎉 Đã đánh dấu xử lý xong Ticket! Hệ thống đã tự cập nhật cho TA.');
+                }, 300);
+            }
+        }
+
+        function openDirectLink(ticketId, student) {
+            showToast(`🔗 Đang mở Direct Link Discord -> Nhảy thẳng đến kênh ${ticketId} của ${student}...`);
+        }
+
+        function sendAIReply(cardId, actionName) {
+            showToast(`⚡ AI đã gửi câu trả lời mẫu "${actionName}" vào Ticket!`);
+        }
+
+        function triggerAIScan() {
+            showToast('🔄 AI Pipeline đang quét lại toàn bộ 24 kênh Discord & Ticket...');
+        }
+    </script>
+</body>
+</html>
