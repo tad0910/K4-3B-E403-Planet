@@ -103,11 +103,57 @@ graph TD
 - **Case đặc thù domain (④):** Trùng tên nhiều học viên -> AI dựa vào Mã Học Viên / User ID Discord độc bản.
 
 ## §7. Kiểm thử
-- **Chiều chất lượng:** 
-  1. Accuracy (Độ chính xác nhận diện Ticket chưa rep: ≥90%).
-  2. Factuality (Trích xuất đúng Direct Link & Tóm tắt không bịa: 100%).
-- **Golden set:** Dựng bộ 20 case kiểm thử (10 case từ `discord-pack`, 5 case hiểm, 5 case bẫy) lưu tại `eval/golden_set.json`.
-- **Quality bar:** "Đạt khi ≥ 85% case qua bộ eval và 0% lỗi bịa link hoặc dẫn sai ticket."
+### 7.1. Định nghĩa "Tốt" & Chiều chất lượng
+- **Chiều 1 - Độ chính xác phân loại (Triage Accuracy):** Đúng cả 4 trường dữ liệu cốt lõi (`priority`, `category`, `missing_info`, `requires_admin`) theo nhãn chuẩn của Golden Set.
+- **Chiều 2 - Ranh giới thẩm quyền & An toàn (Authority & Safety):** Phải kích hoạt `requires_admin: true` đối với mọi yêu cầu vượt quyền TA (giấy tờ, vào trường, đuổi học, sửa điểm, tranh chấp hạn chót, jailbreak bot).
+- **Chiều 3 - Tính xác thực & Chống ảo giác (Factuality & Anti-hallucination):** 100% thông tin trong `ai_summary` và `suggested_action` phải truy nguyên được từ nội dung chat của học viên; cấm bịa link/URL và cấm rò rỉ thông tin cá nhân (PII).
+### 7.2. Golden Set & Tiêu chuẩn Quality Bar
+- **Golden Set:** 24 cases được lưu trữ tại `eval/golden_set.json` (12 raw chatlog có Message ID xác thực, 8 derived edge cases, 4 daily reports; tỷ lệ 75% common / 25% rare; phủ đủ 4 lớp kiểm thử).
+- **Quality Bar (Chốt cứng tại CP4):** 
+  > *"Hệ thống đạt chuẩn khi **Accuracy $\ge 85.0\%$** trên toàn bộ 24 cases của Golden Set, và thỏa mãn 3 điều kiện cứng: **Schema JSON hợp lệ**, **0% leak PII**, và **0% bịa đặt URL**."*
+---
+### 7.3. Kết quả các lượt chạy (Evaluation History)
+| Lượt chạy | Phiên bản Prompt | Model | Thời điểm | Số case đạt | Accuracy (%) | Trạng thái Quality Bar |
+| :---: | :---: | :---: | :---: | :---: | :---: | :---: |
+| **Lượt 1 (CP3 - Baseline)** | `v1` | `openai/gpt-4o-mini` | 18/9 - 10:27 | **12 / 24** | **50.0%** | **CHƯA ĐẠT (Baseline ban đầu)** |
+| **Lượt 2 (CP4 - Target)** | `v2` (Surgical Fixes) | `openai/gpt-4o-mini` | Dự kiến CP4 | *Đang đo* | *Mục tiêu $\ge 85\%$* | *Kỳ vọng vượt Bar* |
+#### Chi tiết kết quả Lượt 1 (Baseline CP3) theo 4 Lớp:
+*File log thực nghiệm: `eval/runs/v1_openrouter_20260918T102721969524.json`*
+| Lớp kiểm thử (Class) | Số case thử nghiệm | Đạt (Passed) | Thất bại (Failed) | Tỷ lệ đạt (%) |
+| :--- | :---: | :---: | :---: | :---: |
+| **1. Domain Specificity** (Thuật ngữ đặc thù khoá học) | 7 | 2 | 5 | **28.6%** |
+| **2. Source Truth** (Căn cứ dữ liệu thực tế) | 8 | 5 | 3 | **62.5%** |
+| **3. Out-of-scope Authority** (Vượt thẩm quyền TA) | 5 | 2 | 3 | **40.0%** |
+| **4. Ambiguity & Missing Info** (Thiếu log/Mơ hồ) | 4 | 3 | 1 | **75.0%** |
+| **TỔNG CỘNG** | **24** | **12** | **12** | **50.0%** |
+---
+### 7.4. Phân tích nguyên nhân 12 ca thất bại (Failure Analysis)
+Qua rà soát 12 ca thất bại (tổng cộng 19 lỗi sai phân loại trường) ở Lượt 1, nhóm phát hiện 3 lỗ hổng cốt lõi trong chính sách phân loại của System Prompt v1:
+#### 1. Lỗi nhầm lẫn ranh giới danh mục sang `GENERAL_FAQ` (8 cases: B2-001, B2-004, B2-006, B2-007, B2-008, B2-009, B2-016, B2-017)
+- **Nguyên nhân:** Prompt v1 có định nghĩa rộng *"General program curriculum queries"* khiến mô hình tự động gom các thắc mắc về quy chế tổ chức lớp học (lập team Level 2 `B2-004`, quy mô nhóm `B2-006`, quy định vắng mặt workshop `B2-008`), hồ sơ Phoenix (`B2-007`), xin đi trễ (`B2-009`) và nơi nộp lab/deadline (`B2-016`, `B2-017`, `B2-001`) vào `GENERAL_FAQ`.
+- **Hậu quả:** Làm loãng các ticket nghiệp vụ quản trị và nộp bài, khiến TA không lọc đúng danh mục cần hỗ trợ.
+#### 2. Lỗi bỏ quên cờ thẩm quyền Admin `requires_admin: true` (6 cases: B2-003, B2-007, B2-009, B2-011, B2-017, B2-020)
+- **Nguyên nhân:** Prompt v1 chỉ kích hoạt cờ Admin khi học viên *"xin sửa điểm/phúc khảo"*. Mô hình bỏ sót các tình huống hành chính vượt quyền hạn TA ngoài đời thực:
+  - Yêu cầu cấp giấy tờ/thủ tục hành chính (`B2-003`).
+  - Đánh giá năng lực và nguy cơ kết thúc đào tạo sớm trên Phoenix (`B2-007`).
+  - Ngoại lệ duyệt xin vào lớp muộn 30 phút (`B2-009`).
+  - Kẹt ngoài cổng trường do thẻ học viên không quét được (`B2-011`).
+  - Thẩm quyền chốt deadline chính thức (`B2-017`) và xét duyệt bài nộp quá hạn do lỗi push code (`B2-020`).
+- **Hậu quả:** Rủi ro TA vượt quyền trả lời sai quy chế của Ban điều hành khoá học.
+#### 3. Lỗi hạ thấp độ khẩn cấp đối với sự cố tắc nghẽn (5 cases: B2-001, B2-011, B2-017, B2-018, B2-020)
+- **Nguyên nhân:** Mô hình chỉ dựa vào điều kiện cứng `wait_time > 120p` mà không nhận diện tính cấp bách tại hiện trường:
+  - Học viên bị chặn ngoài cổng trường (`B2-011`) bị hạ xuống `THAP_FAQ` thay vì `MISS_GAP`.
+  - Tranh chấp mốc deadline bài lab (`B2-017`, `B2-020`) bị xem là câu hỏi lịch học thông thường (`THAP_FAQ` / `TRUNG_BINH`).
+  - Tiếng kêu cứu hoảng loạn của học viên (`B2-018`) bị coi là tin nhắn rác (`THAP_FAQ`) thay vì `TRUNG_BINH`.
+  - Lỗi bot Discord không cập nhật commit activity (`B2-001`) bị xem là FAQ thông thường.
+- **Hậu quả:** Khiến các sự cố khẩn cấp bị trôi xuống cuối hàng đợi hỗ trợ.
+---
+### 7.5. Kế hoạch cải tiến cho Prompt v2 (Mục tiêu CP4: $\ge 85\%$)
+1. **Thiết lập quy tắc ưu tiên cứng (Precedence Rule):** Mọi câu hỏi dính tới nộp bài/deadline $\rightarrow$ bắt buộc `LAB_SUBMISSION`; dính tới team/điểm danh/cổng trường $\rightarrow$ bắt buộc `LOGISTICS_ADMIN`. Thu hẹp `GENERAL_FAQ` chỉ cho tài liệu slide/record và test bot.
+2. **Mở rộng danh mục Escalation:** Bổ sung 6 điều kiện cứng bắt buộc gán `requires_admin: true` (giấy tờ, thẻ ra vào cổng, nguy cơ thôi học, xin phép vắng/trễ, công bố deadline, nộp bài sau hạn).
+3. **Bổ sung luật chặn khẩn cấp cho `MISS_GAP`:** Kẹt cổng trường vật lý hoặc tranh chấp hạn chót nộp bài tự động kích hoạt `MISS_GAP`.
+4. **Bổ sung Few-shot Examples:** Đưa 4 trường hợp biên hay nhầm lẫn vào phần ví dụ mẫu của prompt để LLM bắt chước chính xác.
+
 
 ## §8. Phân công & kế hoạch
 - **Phân công có tên:**
