@@ -37,6 +37,15 @@ body {
   overflow: hidden;
 }
 
+button {
+  outline: none;
+  font-family: inherit;
+}
+
+button:focus, button:focus-visible {
+  outline: none;
+}
+
 #root {
   height: 100vh;
   display: flex;

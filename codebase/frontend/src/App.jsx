@@ -6,6 +6,7 @@ import MetricsGrid from './components/MetricsGrid';
 import FilterBar from './components/FilterBar';
 import TicketCard from './components/TicketCard';
 import AIReplyModal from './components/AIReplyModal';
+import UrgentDigestModal, { isTicketUrgent } from './components/UrgentDigestModal';
 import Toast from './components/Toast';
 import { INITIAL_TICKETS, INITIAL_METRICS } from './data/initialData';
 import { ChevronDown, PlusCircle, Sparkles, Loader2, X } from 'lucide-react';
@@ -15,6 +16,7 @@ export default function App() {
   const [metrics, setMetrics] = useState(INITIAL_METRICS);
   const [activeCategory, setActiveCategory] = useState('all');
   const [activeModalTicket, setActiveModalTicket] = useState(null);
+  const [isDigestOpen, setIsDigestOpen] = useState(false);
   const [toastMessage, setToastMessage] = useState('');
   const [isScanning, setIsScanning] = useState(false);
   const [isCustomModalOpen, setIsCustomModalOpen] = useState(false);
@@ -37,7 +39,7 @@ export default function App() {
       .then((data) => {
         if (data && data.tickets && data.tickets.length > 0) {
           setTickets(data.tickets);
-          const urgentCount = data.tickets.filter((t) => t.statusType === 'urgent').length;
+          const urgentCount = data.tickets.filter((t) => isTicketUrgent(t)).length;
           setMetrics((prev) => ({
             ...prev,
             totalOpen: data.tickets.length,
@@ -80,63 +82,89 @@ export default function App() {
     showToast(`🔗 Đang mở Direct Link Discord -> Chuyển thẳng tới kênh ${ticket.channel} của ${ticket.userName}...`);
   };
 
-  // Trigger AI Scan thật: Gửi Ticket đầu tiên chưa phân tích lên AI backend
+  // Điều hướng từ UrgentDigestModal đến đúng Ticket
+  const handleNavigateToTicketFromDigest = (ticket) => {
+    setIsDigestOpen(false);
+    setActiveCategory('all');
+    setTimeout(() => {
+      handleOpenModal(ticket);
+      showToast(`🔍 Đang mở chi tiết Ticket #${ticket.id} của ${ticket.userName}`);
+    }, 150);
+  };
+
+  // Trigger AI Scan thật: Quét TOÀN BỘ danh sách Ticket
   const handleTriggerAIScan = async () => {
-    if (isScanning) return;
-    const targetTicket = tickets.find((t) => !t.isAnalyzed) || tickets[0];
-    if (!targetTicket) {
-      showToast('Tất cả ticket đều đã được AI phân tích!');
-      return;
-    }
+    if (isScanning || tickets.length === 0) return;
 
     setIsScanning(true);
-    showToast(`🤖 Đang gọi mô hình AI thật để phân tích [${targetTicket.id}]...`);
+    showToast(`🤖 Đang bắt đầu quét AI toàn bộ ${tickets.length} ticket...`);
 
-    try {
-      const res = await fetch('/api/classify', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          ticket_id: targetTicket.id,
-          title: targetTicket.title,
-          author: targetTicket.studentId || 'Học viên',
-          wait_time_minutes: parseInt(targetTicket.timeElapsed) || 120,
-          content: targetTicket.studentQuestion
-        })
-      });
+    let analyzedCount = 0;
+    const updatedTickets = [...tickets];
 
-      if (!res.ok) throw new Error(`HTTP ${res.status}`);
-      const data = await res.json();
-      const ai = data.ai_result;
+    for (let i = 0; i < updatedTickets.length; i++) {
+      const t = updatedTickets[i];
+      try {
+        const waitMins = typeof t.waitTimeMinutes === 'number'
+          ? t.waitTimeMinutes
+          : t.timeElapsed?.includes('h')
+          ? parseInt(t.timeElapsed, 10) * 60
+          : parseInt(t.timeElapsed, 10) || 30;
 
-      // Cập nhật ticket với kết quả AI thật
-      setTickets((prev) =>
-        prev.map((t) => {
-          if (t.id === targetTicket.id) {
-            const isUrgent = ai.priority === 'MISS_GAP';
-            return {
-              ...t,
-              statusTag: isUrgent ? `🚨 MISS GẤP (${t.timeElapsed})` : ai.priority === 'TRUNG_BINH' ? `🟡 TRUNG BÌNH (${t.timeElapsed})` : `🟢 THẤP FAQ (${t.timeElapsed})`,
-              statusType: isUrgent ? 'urgent' : ai.priority === 'TRUNG_BINH' ? 'warning' : 'new',
-              aiSummary: ai.ai_summary,
-              aiSuggestedAction: ai.suggested_action,
-              aiDraftReply: `Chào ${t.userName}!\n\n${ai.ai_summary}\n\n👉 Hướng giải quyết đề xuất: ${ai.suggested_action}\n\nChúc em học tập tốt!`,
-              aiModel: ai.model_used || 'gpt-4o-mini',
-              aiLatency: `${ai.latency_seconds}s`,
-              isAnalyzed: true
-            };
-          }
-          return t;
-        })
-      );
+        const res = await fetch('/api/classify', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            ticket_id: t.id,
+            title: t.title,
+            author: t.studentId || 'Học viên',
+            wait_time_minutes: waitMins,
+            content: t.studentQuestion || t.content || ''
+          })
+        });
 
-      showToast(`✅ AI [${ai.provider_used.toUpperCase()}] phân tích xong trong ${ai.latency_seconds}s! Gắn cờ: [${ai.priority}]`);
-    } catch (err) {
-      console.error(err);
-      showToast(`❌ Lỗi gọi AI backend: ${err.message}. Hãy đảm bảo server python codebase/api.py đang chạy.`);
-    } finally {
-      setIsScanning(false);
+        if (res.ok) {
+          const data = await res.json();
+          const ai = data.ai_result;
+          const isUrgent = ai.priority === 'MISS_GAP' || waitMins >= 120;
+
+          updatedTickets[i] = {
+            ...t,
+            statusTag: isUrgent
+              ? `🚨 BỎ SÓT >2H (${t.timeElapsed})`
+              : ai.priority === 'TRUNG_BINH'
+              ? `🟡 CẦN CHÚ Ý (${t.timeElapsed})`
+              : `🟢 MỚI TẠO (${t.timeElapsed})`,
+            statusType: isUrgent ? 'urgent' : ai.priority === 'TRUNG_BINH' ? 'warning' : 'new',
+            category: ai.category?.toLowerCase().includes('cvat')
+              ? 'cvat'
+              : ai.category?.toLowerCase().includes('logistics') || ai.requires_admin
+              ? 'logistics'
+              : 'prompt',
+            requiresAdmin: ai.requires_admin || false,
+            aiSummary: ai.ai_summary,
+            aiSuggestedAction: ai.suggested_action,
+            aiDraftReply: `Chào ${t.userName}!\n\n${ai.ai_summary}\n\n👉 Hướng giải quyết đề xuất: ${ai.suggested_action}\n\nChúc em học tập tốt!`,
+            aiModel: ai.model_used || 'gemini-3.5-flash-lite',
+            aiLatency: `${ai.latency_seconds}s`,
+            isAnalyzed: true
+          };
+          analyzedCount++;
+        }
+      } catch (err) {
+        console.error(`Lỗi phân tích ticket ${t.id}:`, err);
+      }
     }
+
+    setTickets(updatedTickets);
+    const urgentCount = updatedTickets.filter((t) => isTicketUrgent(t)).length;
+    setMetrics((prev) => ({
+      ...prev,
+      totalOpen: updatedTickets.length,
+      missedUrgent: urgentCount
+    }));
+    setIsScanning(false);
+    showToast(`✅ Đã quét AI hoàn tất toàn bộ ${analyzedCount}/${updatedTickets.length} ticket!`);
   };
 
   // Thử nghiệm phân loại câu hỏi bất kỳ (Phục vụ Test Thẻ Giám Khảo CP6)
@@ -167,30 +195,45 @@ export default function App() {
       const data = await res.json();
       const ai = data.ai_result;
 
-      const isUrgent = ai.priority === 'MISS_GAP';
+      const isUrgent = ai.priority === 'MISS_GAP' || customWaitTime >= 120;
+      const formattedTime = customWaitTime >= 60
+        ? `${Math.floor(customWaitTime / 60)}h ${customWaitTime % 60}m`
+        : `${customWaitTime}m`;
+
       const newCard = {
         id: `T-JUDGE-${Date.now().toString().slice(-4)}`,
-        cardId: `ticket-judge`,
+        cardId: `ticket-judge-${Date.now()}`,
         userInitials: 'GK',
         avatarBg: '#5865f2',
         userName: 'Thẻ Giám Khảo Live',
-        studentId: 'JUDGE-CARD',
+        studentId: 'HV-JUDGE',
         channel: '#live-judge-test',
-        timeElapsed: `${Math.floor(customWaitTime / 60)}h ${customWaitTime % 60}m`,
-        statusTag: isUrgent ? `🚨 MISS GẤP (${Math.floor(customWaitTime / 60)}h)` : `🟡 ${ai.priority}`,
-        statusType: isUrgent ? 'urgent' : 'warning',
-        category: ai.category.toLowerCase().includes('cvat') ? 'cvat' : 'logistics',
+        waitTimeMinutes: customWaitTime,
+        timeElapsed: formattedTime,
+        statusTag: isUrgent
+          ? `🚨 BỎ SÓT >2H (${formattedTime})`
+          : ai.priority === 'TRUNG_BINH'
+          ? `🟡 CẦN CHÚ Ý`
+          : `🟢 MỚI TẠO`,
+        statusType: isUrgent ? 'urgent' : ai.priority === 'TRUNG_BINH' ? 'warning' : 'new',
+        category: ai.category?.toLowerCase().includes('cvat')
+          ? 'cvat'
+          : ai.category?.toLowerCase().includes('logistics') || ai.requires_admin
+          ? 'logistics'
+          : 'prompt',
+        requiresAdmin: ai.requires_admin || false,
         title: customTitle,
         studentQuestion: customContent,
         aiSummary: ai.ai_summary,
         aiSuggestedAction: ai.suggested_action,
-        aiDraftReply: `Chào bạn!\n\n${ai.ai_summary}\n\n👉 Đề xuất: ${ai.suggested_action}`,
-        aiModel: ai.model_used || 'gpt-4o-mini',
+        aiDraftReply: `Chào bạn!\n\n${ai.ai_summary}\n\n👉 Đề xuất xử lý: ${ai.suggested_action}`,
+        aiModel: ai.model_used || 'gemini-3.5-flash-lite',
         aiLatency: `${ai.latency_seconds}s`,
         isAnalyzed: true
       };
 
       setTickets((prev) => [newCard, ...prev]);
+      setActiveCategory('all'); // Tự động chọn tab Tất cả để thẻ mới hiển thị ngay lập tức
       setMetrics((prev) => ({
         ...prev,
         totalOpen: prev.totalOpen + 1,
@@ -208,12 +251,22 @@ export default function App() {
     }
   };
 
-  // Filter tickets
+  // Tính toán countMap theo các vai trò đồng bộ với isTicketUrgent
+  const countMap = {
+    all: tickets.length,
+    urgent: tickets.filter((t) => isTicketUrgent(t)).length,
+    coach: tickets.filter((t) => t.category === 'cvat' || t.category === 'prompt').length,
+    admin: tickets.filter(
+      (t) => t.category === 'logistics' || t.requiresAdmin || t.studentQuestion?.toLowerCase().includes('sửa điểm') || t.studentQuestion?.toLowerCase().includes('xin nghỉ')
+    ).length
+  };
+
+  // Filter tickets theo vai trò và độ khẩn cấp
   const filteredTickets = tickets.filter((t) => {
     if (activeCategory === 'all') return true;
-    if (activeCategory === 'urgent') return t.statusType === 'urgent';
-    if (activeCategory === 'cvat') return t.category === 'cvat';
-    if (activeCategory === 'logistics') return t.category === 'logistics';
+    if (activeCategory === 'urgent') return isTicketUrgent(t);
+    if (activeCategory === 'cvat') return t.category === 'cvat' || t.category === 'prompt';
+    if (activeCategory === 'logistics') return t.category === 'logistics' || t.requiresAdmin || t.studentQuestion?.toLowerCase().includes('sửa điểm') || t.studentQuestion?.toLowerCase().includes('xin nghỉ');
     return true;
   });
 
@@ -240,15 +293,16 @@ export default function App() {
             activeCategory={activeCategory}
             onSelectCategory={setActiveCategory}
             onTriggerScan={handleTriggerAIScan}
-            countMap={{ all: tickets.length }}
+            onOpenDigest={() => setIsDigestOpen(true)}
+            countMap={countMap}
           />
 
           {/* Ticket List Header */}
           <div style={styles.listHeaderRow}>
             <div style={styles.titleStack}>
-              <h2 style={styles.sectionTitle}>Ticket cần được hỗ trợ</h2>
+              <h2 style={styles.sectionTitle}>Danh sách Ticket cần hỗ trợ</h2>
               <span style={styles.sectionSubtext}>
-                {filteredTickets.length} cuộc hội thoại đang mở · sắp xếp theo mức độ khẩn cấp
+                {filteredTickets.length} cuộc hội thoại đang mở · sắp xếp theo mức độ khẩn cấp & vai trò xử lý
               </span>
             </div>
 
@@ -294,6 +348,16 @@ export default function App() {
         ticket={activeModalTicket}
         onClose={() => setActiveModalTicket(null)}
         onSend={handleSendAIReply}
+      />
+
+      {/* Modal Bản tin Tóm tắt Khẩn cấp (/urgent-digest) */}
+      <UrgentDigestModal
+        isOpen={isDigestOpen}
+        onClose={() => setIsDigestOpen(false)}
+        tickets={tickets}
+        onOpenOriginal={handleOpenOriginal}
+        onResolve={handleResolveTicket}
+        onSelectTicket={handleNavigateToTicketFromDigest}
       />
 
       {/* Modal Thử nghiệm Thẻ Giám Khảo (Live AI) */}

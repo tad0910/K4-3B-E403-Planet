@@ -14,19 +14,19 @@ export default function ChannelSidebar({ badgeCount = 4 }) {
       <div style={styles.channelContainer}>
         {/* Category 1: KÊNH VĂN BẢN */}
         <div style={styles.categoryTitle}>KÊNH VĂN BẢN</div>
-        
+
         <div style={{ ...styles.channelItem, ...styles.activeChannel }}>
           <div style={styles.channelNameGroup}>
             <span style={styles.alertIcon}>🚨</span>
             <Hash size={16} color="#ffffff" style={{ marginLeft: 2 }} />
-            <span style={styles.channelActiveText}>ta-missed-ticket-alert</span>
+            <span style={styles.channelActiveText}>cảnh báo ticket bỏ sót</span>
           </div>
           {badgeCount > 0 && <span style={styles.badge}>{badgeCount}</span>}
         </div>
 
         {/* Category 2: KÊNH THOẠI */}
         <div style={{ ...styles.categoryTitle, marginTop: '20px' }}>KÊNH THOẠI</div>
-        
+
         <div style={styles.channelItem}>
           <div style={styles.channelNameGroup}>
             <Volume2 size={16} color="#949ba4" />
@@ -41,7 +41,7 @@ export default function ChannelSidebar({ badgeCount = 4 }) {
           <div style={styles.userAvatar}>LN</div>
           <div style={styles.onlineDot} />
         </div>
-        
+
         <div style={styles.userInfo}>
           <span style={styles.userName}>Linh Nguyễn</span>
           <span style={styles.userStatus}>Đang online</span>
