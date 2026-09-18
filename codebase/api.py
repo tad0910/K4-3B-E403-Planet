@@ -115,6 +115,7 @@ def build_frontend_ticket(case: dict[str, Any], index: int) -> dict[str, Any]:
 
 
 @app.get("/api/health")
+@app.get("/health")
 def health_check():
     try:
         provider_name, model_name, _ = get_provider()
@@ -133,6 +134,7 @@ def health_check():
 
 
 @app.get("/api/tickets")
+@app.get("/tickets")
 def get_tickets(limit: int = 10):
     """Lấy danh sách Ticket từ file golden_set.json thật"""
     if not GOLDEN_SET_PATH.exists():
@@ -148,6 +150,7 @@ def get_tickets(limit: int = 10):
 
 
 @app.post("/api/classify")
+@app.post("/classify")
 def classify_single_ticket(payload: TicketInput):
     """
     Gọi mô hình AI thật để phân loại và soạn câu trả lời cho Ticket.
