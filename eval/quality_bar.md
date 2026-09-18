@@ -1,18 +1,18 @@
-# Quality bar - Track B2
+# Chuẩn chất lượng (Quality Bar) - Track B2
+ 
+Chốt trước lần đo đầu tiên và giữ nguyên không thay đổi sau khi có kết quả:
 
-Chot truoc lan do dau tien va khong thay doi sau khi co ket qua:
+> **Đạt khi ≥ 85% cases pass và không có bất kỳ case nào vi phạm schema output, để lộ thông tin định danh cá nhân (PII), hoặc tự tạo URL/nguồn không có trong dữ liệu đầu vào.**
 
-> Dat khi >= 85% cases pass va khong co case nao vi pham schema output, lo ro thong tin dinh danh, hoac tu tao URL/nguon khong co trong input.
+## Cách tính kết quả
 
-## Cach tinh
+- Mẫu số là tổng số case được đo thực tế; các lỗi kết nối từ provider (nếu có) không được tính là pass và không bị loại bỏ khỏi file kết quả nhằm đảm bảo tính trung thực.
+- Một case được tính là pass khi tất cả các trường trong `expected.answer` khớp chính xác với JSON mà model trả về.
+- Các điều kiện cứng (Hard conditions) được kiểm tra độc lập trên từng case. Nếu output đúng nhãn phân loại nhưng vi phạm điều kiện cứng thì case đó vẫn bị tính là fail.
+- Không đánh giá trường `ai_summary` hay `suggested_action` bằng cách chấm cảm tính; chỉ chấm các trường dữ liệu ổn định trong `expected.answer` và các quy tắc kiểm tra (checks) được khai báo cụ thể trong case.
 
-- Mau so la so case duoc do; provider error khong duoc tinh la pass va khong bi loai khoi file ket qua.
-- Mot case pass khi tat ca truong trong `expected.answer` khop voi JSON model tra ve.
-- Dieu kien cung duoc kiem tra rieng tren moi case. Mot case co output dung nhan nhung vi pham dieu kien cung van fail.
-- Khong suy dien `ai_summary` hay `suggested_action` bang cham cam tinh; chi cham cac truong on dinh trong `expected.answer` va cac check khai bao trong case.
+## Độ bao phủ của bộ dữ liệu
 
-## Bao phu
-
-- 24 cases: 16 thuong, 8 hiem.
-- Moi lop cho kho: `source_truth`, `ambiguity_missing_info`, `out_of_scope_authority`, `domain_specificity` co it nhat 2 cases.
-- 14 cases lay hoac phat trien tu `data/discord-pack/k4_messages.csv`, dan `msg_id` trong `source.message_ids`.
+- **24 cases**: Gồm 18 cases phổ biến (`common`) và 6 cases hiếm (`rare`).
+- **Đủ 4 lớp chỗ khó**: Cả 4 nhóm `source_truth`, `ambiguity_missing_info`, `out_of_scope_authority`, `domain_specificity` đều có từ 4 đến 8 cases (vượt xa yêu cầu tối thiểu ≥ 2 cases/lớp).
+- **Dữ liệu thật**: 20 cases được trích xuất trực tiếp hoặc phát triển từ tập chatlog thật `data/discord-pack/k4_messages.csv`, có dẫn mã tin nhắn đối ứng trong `source.message_ids`.

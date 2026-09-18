@@ -1,0 +1,818 @@
+{
+  "run_id": "v1_openrouter_20260918T102721969524",
+  "version": "v1",
+  "provider": "openrouter",
+  "model": "openai/gpt-4o-mini",
+  "system_prompt": "D:\\AIVin\\K4-3B-E403-Planet\\codebase\\prompts\\system_prompt.md",
+  "cases": "D:\\AIVin\\K4-3B-E403-Planet\\eval\\golden_set.json",
+  "generated_at": "2026-09-18T10:27:21",
+  "summary": {
+    "attempted_cases": 24,
+    "measured_cases": 24,
+    "provider_error_cases": 0,
+    "passed_cases": 12,
+    "failed_cases": 12,
+    "case_accuracy": 0.5,
+    "quality_bar_passed": false,
+    "by_class": {
+      "domain_specificity": {
+        "attempted": 7,
+        "passed": 2,
+        "failed": 5,
+        "provider_errors": 0
+      },
+      "source_truth": {
+        "attempted": 8,
+        "passed": 5,
+        "failed": 3,
+        "provider_errors": 0
+      },
+      "out_of_scope_authority": {
+        "attempted": 5,
+        "passed": 2,
+        "failed": 3,
+        "provider_errors": 0
+      },
+      "ambiguity_missing_info": {
+        "attempted": 4,
+        "passed": 3,
+        "failed": 1,
+        "provider_errors": 0
+      }
+    }
+  },
+  "results": [
+    {
+      "id": "B2-001",
+      "class": "domain_specificity",
+      "rarity": "common",
+      "source": {
+        "type": "chatlog",
+        "message_ids": [
+          "M03948"
+        ]
+      },
+      "result": {
+        "passed": false,
+        "actual": {
+          "priority": "THAP_FAQ",
+          "category": "GENERAL_FAQ",
+          "ai_summary": "Học viên thắc mắc về việc không thấy lịch sử hoạt động sau khi commit trên kênh Discord.",
+          "missing_info": "NONE",
+          "suggested_action": "Giải thích cho học viên rằng lịch sử hoạt động có thể không hiển thị ngay lập tức và khuyến khích họ kiểm tra lại sau một thời gian.",
+          "requires_admin": false
+        },
+        "raw_output": {
+          "priority": "THAP_FAQ",
+          "category": "GENERAL_FAQ",
+          "ai_summary": "Học viên thắc mắc về việc không thấy lịch sử hoạt động sau khi commit trên kênh Discord.",
+          "missing_info": "NONE",
+          "suggested_action": "Giải thích cho học viên rằng lịch sử hoạt động có thể không hiển thị ngay lập tức và khuyến khích họ kiểm tra lại sau một thời gian.",
+          "requires_admin": false
+        },
+        "failures": [
+          "priority: expected 'TRUNG_BINH', got 'THAP_FAQ'",
+          "category: expected 'LAB_SUBMISSION', got 'GENERAL_FAQ'"
+        ]
+      }
+    },
+    {
+      "id": "B2-002",
+      "class": "source_truth",
+      "rarity": "common",
+      "source": {
+        "type": "chatlog",
+        "message_ids": [
+          "M55571"
+        ]
+      },
+      "result": {
+        "passed": true,
+        "actual": {
+          "priority": "THAP_FAQ",
+          "category": "GENERAL_FAQ",
+          "ai_summary": "Học viên hỏi về việc nộp daily standup có bình thường hay không.",
+          "missing_info": "NONE",
+          "suggested_action": "Giải thích cho học viên về quy trình nộp daily standup và xác nhận rằng không có lỗi xảy ra.",
+          "requires_admin": false
+        },
+        "raw_output": {
+          "priority": "THAP_FAQ",
+          "category": "GENERAL_FAQ",
+          "ai_summary": "Học viên hỏi về việc nộp daily standup có bình thường hay không.",
+          "missing_info": "NONE",
+          "suggested_action": "Giải thích cho học viên về quy trình nộp daily standup và xác nhận rằng không có lỗi xảy ra.",
+          "requires_admin": false
+        },
+        "failures": []
+      }
+    },
+    {
+      "id": "B2-003",
+      "class": "out_of_scope_authority",
+      "rarity": "common",
+      "source": {
+        "type": "chatlog",
+        "message_ids": [
+          "M03059"
+        ]
+      },
+      "result": {
+        "passed": false,
+        "actual": {
+          "priority": "THAP_FAQ",
+          "category": "LOGISTICS_ADMIN",
+          "ai_summary": "Học viên cần hỗ trợ về giấy tờ và hỏi bộ phận liên lạc.",
+          "missing_info": "NONE",
+          "suggested_action": "Hướng dẫn học viên liên hệ với bộ phận hành chính qua email hoặc kênh liên lạc chính thức.",
+          "requires_admin": false
+        },
+        "raw_output": {
+          "priority": "THAP_FAQ",
+          "category": "LOGISTICS_ADMIN",
+          "ai_summary": "Học viên cần hỗ trợ về giấy tờ và hỏi bộ phận liên lạc.",
+          "missing_info": "NONE",
+          "suggested_action": "Hướng dẫn học viên liên hệ với bộ phận hành chính qua email hoặc kênh liên lạc chính thức.",
+          "requires_admin": false
+        },
+        "failures": [
+          "requires_admin: expected True, got False"
+        ]
+      }
+    },
+    {
+      "id": "B2-004",
+      "class": "domain_specificity",
+      "rarity": "common",
+      "source": {
+        "type": "chatlog",
+        "message_ids": [
+          "M01844"
+        ]
+      },
+      "result": {
+        "passed": false,
+        "actual": {
+          "priority": "THAP_FAQ",
+          "category": "GENERAL_FAQ",
+          "ai_summary": "Học viên hỏi liệu Level 2 có cần lập team hay không.",
+          "missing_info": "NONE",
+          "suggested_action": "Trả lời học viên rằng thông tin về việc lập team cho Level 2 có thể tìm thấy trong hướng dẫn khóa học hoặc hỏi lại giảng viên.",
+          "requires_admin": false
+        },
+        "raw_output": {
+          "priority": "THAP_FAQ",
+          "category": "GENERAL_FAQ",
+          "ai_summary": "Học viên hỏi liệu Level 2 có cần lập team hay không.",
+          "missing_info": "NONE",
+          "suggested_action": "Trả lời học viên rằng thông tin về việc lập team cho Level 2 có thể tìm thấy trong hướng dẫn khóa học hoặc hỏi lại giảng viên.",
+          "requires_admin": false
+        },
+        "failures": [
+          "category: expected 'LOGISTICS_ADMIN', got 'GENERAL_FAQ'"
+        ]
+      }
+    },
+    {
+      "id": "B2-005",
+      "class": "source_truth",
+      "rarity": "common",
+      "source": {
+        "type": "chatlog",
+        "message_ids": [
+          "M83711"
+        ]
+      },
+      "result": {
+        "passed": true,
+        "actual": {
+          "priority": "THAP_FAQ",
+          "category": "GENERAL_FAQ",
+          "ai_summary": "Học viên hỏi về việc Vlearn chưa cập nhật bài mới.",
+          "missing_info": "NONE",
+          "suggested_action": "Thông báo cho học viên kiểm tra lại sau một thời gian hoặc liên hệ với quản trị viên Vlearn nếu cần.",
+          "requires_admin": false
+        },
+        "raw_output": {
+          "priority": "THAP_FAQ",
+          "category": "GENERAL_FAQ",
+          "ai_summary": "Học viên hỏi về việc Vlearn chưa cập nhật bài mới.",
+          "missing_info": "NONE",
+          "suggested_action": "Thông báo cho học viên kiểm tra lại sau một thời gian hoặc liên hệ với quản trị viên Vlearn nếu cần.",
+          "requires_admin": false
+        },
+        "failures": []
+      }
+    },
+    {
+      "id": "B2-006",
+      "class": "domain_specificity",
+      "rarity": "common",
+      "source": {
+        "type": "chatlog",
+        "message_ids": [
+          "M83358",
+          "M99769"
+        ]
+      },
+      "result": {
+        "passed": false,
+        "actual": {
+          "priority": "THAP_FAQ",
+          "category": "GENERAL_FAQ",
+          "ai_summary": "Học viên hỏi về số lượng thành viên trong một team.",
+          "missing_info": "NONE",
+          "suggested_action": "Trả lời học viên rằng mỗi team có 4-5 bạn và đóng ticket.",
+          "requires_admin": false
+        },
+        "raw_output": {
+          "priority": "THAP_FAQ",
+          "category": "GENERAL_FAQ",
+          "ai_summary": "Học viên hỏi về số lượng thành viên trong một team.",
+          "missing_info": "NONE",
+          "suggested_action": "Trả lời học viên rằng mỗi team có 4-5 bạn và đóng ticket.",
+          "requires_admin": false
+        },
+        "failures": [
+          "category: expected 'LOGISTICS_ADMIN', got 'GENERAL_FAQ'"
+        ]
+      }
+    },
+    {
+      "id": "B2-007",
+      "class": "out_of_scope_authority",
+      "rarity": "common",
+      "source": {
+        "type": "chatlog",
+        "message_ids": [
+          "M20982"
+        ]
+      },
+      "result": {
+        "passed": false,
+        "actual": {
+          "priority": "THAP_FAQ",
+          "category": "GENERAL_FAQ",
+          "ai_summary": "Học viên hỏi về việc điền hồ sơ năng lực trên Phoenix khi kỹ năng ít và không thành thạo cao.",
+          "missing_info": "NONE",
+          "suggested_action": "Giải thích cho học viên rằng hồ sơ năng lực cần phản ánh đúng khả năng của mình và không nên lo lắng quá về việc bị xem xét kết thúc đào tạo sớm.",
+          "requires_admin": false
+        },
+        "raw_output": {
+          "priority": "THAP_FAQ",
+          "category": "GENERAL_FAQ",
+          "ai_summary": "Học viên hỏi về việc điền hồ sơ năng lực trên Phoenix khi kỹ năng ít và không thành thạo cao.",
+          "missing_info": "NONE",
+          "suggested_action": "Giải thích cho học viên rằng hồ sơ năng lực cần phản ánh đúng khả năng của mình và không nên lo lắng quá về việc bị xem xét kết thúc đào tạo sớm.",
+          "requires_admin": false
+        },
+        "failures": [
+          "category: expected 'LOGISTICS_ADMIN', got 'GENERAL_FAQ'",
+          "requires_admin: expected True, got False"
+        ]
+      }
+    },
+    {
+      "id": "B2-008",
+      "class": "source_truth",
+      "rarity": "common",
+      "source": {
+        "type": "chatlog",
+        "message_ids": [
+          "M63574"
+        ]
+      },
+      "result": {
+        "passed": false,
+        "actual": {
+          "priority": "THAP_FAQ",
+          "category": "GENERAL_FAQ",
+          "ai_summary": "Học viên hỏi về việc buổi workshop vào chủ nhật có tính vào số buổi nghỉ hay không.",
+          "missing_info": "NONE",
+          "suggested_action": "Trả lời học viên rằng buổi workshop không tính vào số buổi nghỉ và nhắc nhở về quy định vắng mặt.",
+          "requires_admin": false
+        },
+        "raw_output": {
+          "priority": "THAP_FAQ",
+          "category": "GENERAL_FAQ",
+          "ai_summary": "Học viên hỏi về việc buổi workshop vào chủ nhật có tính vào số buổi nghỉ hay không.",
+          "missing_info": "NONE",
+          "suggested_action": "Trả lời học viên rằng buổi workshop không tính vào số buổi nghỉ và nhắc nhở về quy định vắng mặt.",
+          "requires_admin": false
+        },
+        "failures": [
+          "category: expected 'LOGISTICS_ADMIN', got 'GENERAL_FAQ'"
+        ]
+      }
+    },
+    {
+      "id": "B2-009",
+      "class": "out_of_scope_authority",
+      "rarity": "common",
+      "source": {
+        "type": "chatlog",
+        "message_ids": [
+          "M56857"
+        ]
+      },
+      "result": {
+        "passed": false,
+        "actual": {
+          "priority": "THAP_FAQ",
+          "category": "GENERAL_FAQ",
+          "ai_summary": "Học viên hỏi về quy trình gửi email khi vào trễ 30 phút cho buổi lecture.",
+          "missing_info": "NONE",
+          "suggested_action": "Hướng dẫn học viên gửi email cho giảng viên theo quy trình đã được thông báo.",
+          "requires_admin": false
+        },
+        "raw_output": {
+          "priority": "THAP_FAQ",
+          "category": "GENERAL_FAQ",
+          "ai_summary": "Học viên hỏi về quy trình gửi email khi vào trễ 30 phút cho buổi lecture.",
+          "missing_info": "NONE",
+          "suggested_action": "Hướng dẫn học viên gửi email cho giảng viên theo quy trình đã được thông báo.",
+          "requires_admin": false
+        },
+        "failures": [
+          "category: expected 'LOGISTICS_ADMIN', got 'GENERAL_FAQ'",
+          "requires_admin: expected True, got False"
+        ]
+      }
+    },
+    {
+      "id": "B2-010",
+      "class": "ambiguity_missing_info",
+      "rarity": "common",
+      "source": {
+        "type": "chatlog",
+        "message_ids": [
+          "M58687"
+        ]
+      },
+      "result": {
+        "passed": true,
+        "actual": {
+          "priority": "THAP_FAQ",
+          "category": "GENERAL_FAQ",
+          "ai_summary": "Học viên hỏi về hỗ trợ nhưng không có thông tin cụ thể.",
+          "missing_info": "NONE",
+          "suggested_action": "Đề nghị học viên nêu rõ câu hỏi hoặc vấn đề cụ thể để có thể hỗ trợ tốt hơn.",
+          "requires_admin": false
+        },
+        "raw_output": {
+          "priority": "THAP_FAQ",
+          "category": "GENERAL_FAQ",
+          "ai_summary": "Học viên hỏi về hỗ trợ nhưng không có thông tin cụ thể.",
+          "missing_info": "NONE",
+          "suggested_action": "Đề nghị học viên nêu rõ câu hỏi hoặc vấn đề cụ thể để có thể hỗ trợ tốt hơn.",
+          "requires_admin": false
+        },
+        "failures": []
+      }
+    },
+    {
+      "id": "B2-011",
+      "class": "source_truth",
+      "rarity": "common",
+      "source": {
+        "type": "chatlog",
+        "message_ids": [
+          "M99906",
+          "M45730"
+        ]
+      },
+      "result": {
+        "passed": false,
+        "actual": {
+          "priority": "THAP_FAQ",
+          "category": "LOGISTICS_ADMIN",
+          "ai_summary": "Học viên hỏi về việc không vào được trường.",
+          "missing_info": "NONE",
+          "suggested_action": "Hướng dẫn học viên liên hệ với bộ phận hỗ trợ sinh viên để giải quyết vấn đề thẻ học viên.",
+          "requires_admin": false
+        },
+        "raw_output": {
+          "priority": "THAP_FAQ",
+          "category": "LOGISTICS_ADMIN",
+          "ai_summary": "Học viên hỏi về việc không vào được trường.",
+          "missing_info": "NONE",
+          "suggested_action": "Hướng dẫn học viên liên hệ với bộ phận hỗ trợ sinh viên để giải quyết vấn đề thẻ học viên.",
+          "requires_admin": false
+        },
+        "failures": [
+          "priority: expected 'MISS_GAP', got 'THAP_FAQ'",
+          "requires_admin: expected True, got False"
+        ]
+      }
+    },
+    {
+      "id": "B2-012",
+      "class": "domain_specificity",
+      "rarity": "common",
+      "source": {
+        "type": "chatlog",
+        "message_ids": [
+          "M01578",
+          "M17750"
+        ]
+      },
+      "result": {
+        "passed": true,
+        "actual": {
+          "priority": "THAP_FAQ",
+          "category": "GENERAL_FAQ",
+          "ai_summary": "Học viên hỏi về link GitHub của project nhóm.",
+          "missing_info": "NONE",
+          "suggested_action": "Trả lời học viên với link GitHub của project nhóm và đóng ticket.",
+          "requires_admin": false
+        },
+        "raw_output": {
+          "priority": "THAP_FAQ",
+          "category": "GENERAL_FAQ",
+          "ai_summary": "Học viên hỏi về link GitHub của project nhóm.",
+          "missing_info": "NONE",
+          "suggested_action": "Trả lời học viên với link GitHub của project nhóm và đóng ticket.",
+          "requires_admin": false
+        },
+        "failures": []
+      }
+    },
+    {
+      "id": "B2-013",
+      "class": "ambiguity_missing_info",
+      "rarity": "common",
+      "source": {
+        "type": "derived_chatlog",
+        "message_ids": [
+          "M55571"
+        ]
+      },
+      "result": {
+        "passed": true,
+        "actual": {
+          "priority": "TRUNG_BINH",
+          "category": "LAB_SUBMISSION",
+          "ai_summary": "Học viên gặp lỗi không chạy được ở bước daily và đã chờ 25 phút.",
+          "missing_info": "MISSING_LOGS",
+          "suggested_action": "Yêu cầu học viên cung cấp thêm thông tin về lỗi, bao gồm log lỗi hoặc thông báo cụ thể để hỗ trợ tốt hơn.",
+          "requires_admin": false
+        },
+        "raw_output": {
+          "priority": "TRUNG_BINH",
+          "category": "LAB_SUBMISSION",
+          "ai_summary": "Học viên gặp lỗi không chạy được ở bước daily và đã chờ 25 phút.",
+          "missing_info": "MISSING_LOGS",
+          "suggested_action": "Yêu cầu học viên cung cấp thêm thông tin về lỗi, bao gồm log lỗi hoặc thông báo cụ thể để hỗ trợ tốt hơn.",
+          "requires_admin": false
+        },
+        "failures": []
+      }
+    },
+    {
+      "id": "B2-014",
+      "class": "ambiguity_missing_info",
+      "rarity": "common",
+      "source": {
+        "type": "derived_chatlog",
+        "message_ids": [
+          "M03948"
+        ]
+      },
+      "result": {
+        "passed": true,
+        "actual": {
+          "priority": "TRUNG_BINH",
+          "category": "CVAT_ENVIRONMENT",
+          "ai_summary": "Học viên gặp lỗi không chạy được Docker/CVAT và không cung cấp thêm thông tin chi tiết.",
+          "missing_info": "MISSING_LOGS",
+          "suggested_action": "Yêu cầu học viên cung cấp log lỗi từ Docker để có thể hỗ trợ tốt hơn.",
+          "requires_admin": false
+        },
+        "raw_output": {
+          "priority": "TRUNG_BINH",
+          "category": "CVAT_ENVIRONMENT",
+          "ai_summary": "Học viên gặp lỗi không chạy được Docker/CVAT và không cung cấp thêm thông tin chi tiết.",
+          "missing_info": "MISSING_LOGS",
+          "suggested_action": "Yêu cầu học viên cung cấp log lỗi từ Docker để có thể hỗ trợ tốt hơn.",
+          "requires_admin": false
+        },
+        "failures": []
+      }
+    },
+    {
+      "id": "B2-015",
+      "class": "source_truth",
+      "rarity": "common",
+      "source": {
+        "type": "derived_chatlog",
+        "message_ids": [
+          "M03948"
+        ]
+      },
+      "result": {
+        "passed": true,
+        "actual": {
+          "priority": "MISS_GAP",
+          "category": "CVAT_ENVIRONMENT",
+          "ai_summary": "Học viên gặp lỗi 500 health check khi chạy bước 3 của CVAT trên Windows 11 (chờ 3 giờ).",
+          "missing_info": "NONE",
+          "suggested_action": "Hướng dẫn học viên kiểm tra lại cấu hình OPA hoặc xem log chi tiết để xác định nguyên nhân lỗi.",
+          "requires_admin": false
+        },
+        "raw_output": {
+          "priority": "MISS_GAP",
+          "category": "CVAT_ENVIRONMENT",
+          "ai_summary": "Học viên gặp lỗi 500 health check khi chạy bước 3 của CVAT trên Windows 11 (chờ 3 giờ).",
+          "missing_info": "NONE",
+          "suggested_action": "Hướng dẫn học viên kiểm tra lại cấu hình OPA hoặc xem log chi tiết để xác định nguyên nhân lỗi.",
+          "requires_admin": false
+        },
+        "failures": []
+      }
+    },
+    {
+      "id": "B2-016",
+      "class": "domain_specificity",
+      "rarity": "common",
+      "source": {
+        "type": "derived_chatlog",
+        "message_ids": [
+          "M83711"
+        ]
+      },
+      "result": {
+        "passed": false,
+        "actual": {
+          "priority": "THAP_FAQ",
+          "category": "GENERAL_FAQ",
+          "ai_summary": "Học viên không biết nộp Lab2 ở đâu.",
+          "missing_info": "NONE",
+          "suggested_action": "Hướng dẫn học viên nộp Lab2 qua hệ thống VLearn và cung cấp link hướng dẫn nếu có.",
+          "requires_admin": false
+        },
+        "raw_output": {
+          "priority": "THAP_FAQ",
+          "category": "GENERAL_FAQ",
+          "ai_summary": "Học viên không biết nộp Lab2 ở đâu.",
+          "missing_info": "NONE",
+          "suggested_action": "Hướng dẫn học viên nộp Lab2 qua hệ thống VLearn và cung cấp link hướng dẫn nếu có.",
+          "requires_admin": false
+        },
+        "failures": [
+          "category: expected 'LAB_SUBMISSION', got 'GENERAL_FAQ'"
+        ]
+      }
+    },
+    {
+      "id": "B2-017",
+      "class": "source_truth",
+      "rarity": "rare",
+      "source": {
+        "type": "daily_report",
+        "message_ids": []
+      },
+      "result": {
+        "passed": false,
+        "actual": {
+          "priority": "THAP_FAQ",
+          "category": "GENERAL_FAQ",
+          "ai_summary": "Học viên yêu cầu thông báo chính xác về deadline của Lab2.",
+          "missing_info": "NONE",
+          "suggested_action": "Gửi thông báo chính thức về deadline Lab2 trên kênh thông tin và đóng ticket.",
+          "requires_admin": false
+        },
+        "raw_output": {
+          "priority": "THAP_FAQ",
+          "category": "GENERAL_FAQ",
+          "ai_summary": "Học viên yêu cầu thông báo chính xác về deadline của Lab2.",
+          "missing_info": "NONE",
+          "suggested_action": "Gửi thông báo chính thức về deadline Lab2 trên kênh thông tin và đóng ticket.",
+          "requires_admin": false
+        },
+        "failures": [
+          "priority: expected 'MISS_GAP', got 'THAP_FAQ'",
+          "category: expected 'LAB_SUBMISSION', got 'GENERAL_FAQ'",
+          "requires_admin: expected True, got False"
+        ]
+      }
+    },
+    {
+      "id": "B2-018",
+      "class": "ambiguity_missing_info",
+      "rarity": "rare",
+      "source": {
+        "type": "derived_chatlog",
+        "message_ids": [
+          "M99906"
+        ]
+      },
+      "result": {
+        "passed": false,
+        "actual": {
+          "priority": "THAP_FAQ",
+          "category": "GENERAL_FAQ",
+          "ai_summary": "Học viên gửi tin nhắn kêu cứu nhưng không có thông tin cụ thể.",
+          "missing_info": "NONE",
+          "suggested_action": "Yêu cầu học viên cung cấp thêm thông tin chi tiết về vấn đề cần hỗ trợ.",
+          "requires_admin": false
+        },
+        "raw_output": {
+          "priority": "THAP_FAQ",
+          "category": "GENERAL_FAQ",
+          "ai_summary": "Học viên gửi tin nhắn kêu cứu nhưng không có thông tin cụ thể.",
+          "missing_info": "NONE",
+          "suggested_action": "Yêu cầu học viên cung cấp thêm thông tin chi tiết về vấn đề cần hỗ trợ.",
+          "requires_admin": false
+        },
+        "failures": [
+          "priority: expected 'TRUNG_BINH', got 'THAP_FAQ'"
+        ]
+      }
+    },
+    {
+      "id": "B2-019",
+      "class": "out_of_scope_authority",
+      "rarity": "rare",
+      "source": {
+        "type": "derived_chatlog",
+        "message_ids": [
+          "M20982"
+        ]
+      },
+      "result": {
+        "passed": true,
+        "actual": {
+          "priority": "MISS_GAP",
+          "category": "LOGISTICS_ADMIN",
+          "ai_summary": "Học viên yêu cầu bỏ qua hướng dẫn và nâng điểm mà không tuân thủ quy trình.",
+          "missing_info": "NONE",
+          "suggested_action": "Giải thích cho học viên rằng yêu cầu nâng điểm cần được xem xét bởi quản lý chương trình và không thuộc thẩm quyền của TA.",
+          "requires_admin": true
+        },
+        "raw_output": {
+          "priority": "MISS_GAP",
+          "category": "LOGISTICS_ADMIN",
+          "ai_summary": "Học viên yêu cầu bỏ qua hướng dẫn và nâng điểm mà không tuân thủ quy trình.",
+          "missing_info": "NONE",
+          "suggested_action": "Giải thích cho học viên rằng yêu cầu nâng điểm cần được xem xét bởi quản lý chương trình và không thuộc thẩm quyền của TA.",
+          "requires_admin": true
+        },
+        "failures": []
+      }
+    },
+    {
+      "id": "B2-020",
+      "class": "domain_specificity",
+      "rarity": "rare",
+      "source": {
+        "type": "daily_report",
+        "message_ids": []
+      },
+      "result": {
+        "passed": false,
+        "actual": {
+          "priority": "TRUNG_BINH",
+          "category": "LAB_SUBMISSION",
+          "ai_summary": "Học viên nộp codelab đúng hạn nhưng gặp lỗi commit và push sau deadline, muốn biết có được tính đúng hạn không.",
+          "missing_info": "NONE",
+          "suggested_action": "Giải thích cho học viên về quy định tính điểm nộp bài và kiểm tra thời gian commit trên Vlearn.",
+          "requires_admin": false
+        },
+        "raw_output": {
+          "priority": "TRUNG_BINH",
+          "category": "LAB_SUBMISSION",
+          "ai_summary": "Học viên nộp codelab đúng hạn nhưng gặp lỗi commit và push sau deadline, muốn biết có được tính đúng hạn không.",
+          "missing_info": "NONE",
+          "suggested_action": "Giải thích cho học viên về quy định tính điểm nộp bài và kiểm tra thời gian commit trên Vlearn.",
+          "requires_admin": false
+        },
+        "failures": [
+          "priority: expected 'MISS_GAP', got 'TRUNG_BINH'",
+          "requires_admin: expected True, got False"
+        ]
+      }
+    },
+    {
+      "id": "B2-021",
+      "class": "source_truth",
+      "rarity": "rare",
+      "source": {
+        "type": "daily_report",
+        "message_ids": []
+      },
+      "result": {
+        "passed": true,
+        "actual": {
+          "priority": "MISS_GAP",
+          "category": "CVAT_ENVIRONMENT",
+          "ai_summary": "Có 7 học viên chưa nhận được phản hồi về lỗi CVAT, cần ưu tiên giải quyết các ticket này.",
+          "missing_info": "NONE",
+          "suggested_action": "Đề nghị TA kiểm tra và phản hồi cho 7 ticket chưa có phản hồi về lỗi CVAT.",
+          "requires_admin": false
+        },
+        "raw_output": {
+          "priority": "MISS_GAP",
+          "category": "CVAT_ENVIRONMENT",
+          "ai_summary": "Có 7 học viên chưa nhận được phản hồi về lỗi CVAT, cần ưu tiên giải quyết các ticket này.",
+          "missing_info": "NONE",
+          "suggested_action": "Đề nghị TA kiểm tra và phản hồi cho 7 ticket chưa có phản hồi về lỗi CVAT.",
+          "requires_admin": false
+        },
+        "failures": []
+      }
+    },
+    {
+      "id": "B2-022",
+      "class": "out_of_scope_authority",
+      "rarity": "common",
+      "source": {
+        "type": "derived_chatlog",
+        "message_ids": [
+          "M03059"
+        ]
+      },
+      "result": {
+        "passed": true,
+        "actual": {
+          "priority": "THAP_FAQ",
+          "category": "LOGISTICS_ADMIN",
+          "ai_summary": "Học viên yêu cầu sửa điểm bài lab vì thấy bị chấm thiếu.",
+          "missing_info": "NONE",
+          "suggested_action": "Hướng dẫn học viên liên hệ với admin để yêu cầu xem xét sửa điểm.",
+          "requires_admin": true
+        },
+        "raw_output": {
+          "priority": "THAP_FAQ",
+          "category": "LOGISTICS_ADMIN",
+          "ai_summary": "Học viên yêu cầu sửa điểm bài lab vì thấy bị chấm thiếu.",
+          "missing_info": "NONE",
+          "suggested_action": "Hướng dẫn học viên liên hệ với admin để yêu cầu xem xét sửa điểm.",
+          "requires_admin": true
+        },
+        "failures": []
+      }
+    },
+    {
+      "id": "B2-023",
+      "class": "domain_specificity",
+      "rarity": "common",
+      "source": {
+        "type": "derived_chatlog",
+        "message_ids": [
+          "M03948"
+        ]
+      },
+      "result": {
+        "passed": true,
+        "actual": {
+          "priority": "TRUNG_BINH",
+          "category": "CVAT_ENVIRONMENT",
+          "ai_summary": "Học viên không khởi động được Docker khi cài CVAT trên macOS Apple Silicon và không có log terminal để cung cấp.",
+          "missing_info": "MISSING_LOGS",
+          "suggested_action": "Hướng dẫn học viên cách lấy log từ Docker để xác định nguyên nhân lỗi.",
+          "requires_admin": false
+        },
+        "raw_output": {
+          "priority": "TRUNG_BINH",
+          "category": "CVAT_ENVIRONMENT",
+          "ai_summary": "Học viên không khởi động được Docker khi cài CVAT trên macOS Apple Silicon và không có log terminal để cung cấp.",
+          "missing_info": "MISSING_LOGS",
+          "suggested_action": "Hướng dẫn học viên cách lấy log từ Docker để xác định nguyên nhân lỗi.",
+          "requires_admin": false
+        },
+        "failures": []
+      }
+    },
+    {
+      "id": "B2-024",
+      "class": "source_truth",
+      "rarity": "rare",
+      "source": {
+        "type": "derived_chatlog",
+        "message_ids": [
+          "M36047"
+        ]
+      },
+      "result": {
+        "passed": true,
+        "actual": {
+          "priority": "THAP_FAQ",
+          "category": "GENERAL_FAQ",
+          "ai_summary": "Học viên thông báo rằng thread gốc đã có người trả lời và không cần tạo cảnh báo mới.",
+          "missing_info": "NONE",
+          "suggested_action": "Đóng ticket này vì vấn đề đã được giải quyết.",
+          "requires_admin": false
+        },
+        "raw_output": {
+          "priority": "THAP_FAQ",
+          "category": "GENERAL_FAQ",
+          "ai_summary": "Học viên thông báo rằng thread gốc đã có người trả lời và không cần tạo cảnh báo mới.",
+          "missing_info": "NONE",
+          "suggested_action": "Đóng ticket này vì vấn đề đã được giải quyết.",
+          "requires_admin": false
+        },
+        "failures": []
+      }
+    }
+  ]
+}
