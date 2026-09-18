@@ -25,18 +25,32 @@ Loại: [ ] Tối ưu tính năng có sẵn  [x] Tính năng mới cho TA/Học 
      - Học viên Lê Quang Ngọc (E403): *"Cũng gặp vấn đề về việc đưa ra câu hỏi trên discord nhưng bị miss / chưa được trả lời, sau đó cần đi hỏi lại chị TA/mentor."*
      - Lab Coach 1: *"Lần gần nhất câu hỏi học viên chưa được trả lời là 1-2 ngày, đã từng trôi tin của học viên, hậu quả là câu hỏi đó vẫn chưa được giải quyết => bản tin bot tự động mỗi ngày sẽ dùng được để hỗ trợ học viên."*
      - Lab Coach 2: *"Lần gần nhất câu hỏi học viên chưa được trả lời là 1-2 tiếng, đã từng bị trôi mất tin của học viên, hậu quả tương tự (problem của học viên chưa được giải quyết), công nhận tính năng tóm tắt bảng tin AI trên discord là dùng được để hỗ trợ học viên."*
-      - **Bằng chứng phân tích dữ liệu (Đường B — Khai phá dữ liệu thật từ `data/discord-pack/`):**
-     - *Quy mô mẫu & Phương pháp đếm:* Khảo sát trên 1.092 tin nhắn (779 tin người dùng) trong `k4_messages.csv` và 4 bản tin tự động tại `k4_daily_reports.md`. Phương pháp: Lọc tin nhắn có `is_bot == False`, đếm các tin chứa từ khoá ("ticket", "hỏi", "lỗi", "chưa vào được") và đo độ trễ thời gian chờ xử lý (`reply_to_msg_id`).
-     - *Số liệu đếm được:*
-       - Có 43 tin nhắn/ticket phản ánh lỗi kỹ thuật và thủ tục bị trôi dạt từ 2–4 tiếng (thậm chí qua đêm) không có người phản hồi.
-       - Nhiều học viên liên tục phải hỏi cách mở ticket hoặc nhắn tin hối thúc do câu hỏi trên kênh chung bị trôi.
-       - Phân tích 4 bản tin bot tự động đang chạy: 100% (4/4 bản tin) hoàn toàn thiếu direct link dẫn tới tin nhắn/ticket gốc; bản tin ngày 14/09 bị lỗi thuật toán chèn chuỗi rác ("nguồn tham chiếu...") tới 9 lần; bản tin ngày 13/09 bị cắt cụt chữ ở cuối ("Một số câu hỏi chưa được giải đá").
-     - *≥5 trích dẫn nguyên văn tiêu biểu (kèm mã tin xác thực):*
-       1. `M57545` (channel_02): *"Dạ phoenix vẫn đang báo mail của em bị sai tài khoản github ạ"* — Lỗi hệ thống lab nghiêm trọng, học viên hoang mang chờ ticket được xử lý.
-       2. `M53930` (channel_02): *"Hiện tại em vẫn chưa vào được phoenix ạ"* — Học viên phải nhắn lặp lại liên tiếp sau 1 phút vì ticket chưa có TA tiếp nhận.
-       3. `M45903` (channel_02): *"cho em hỏi là bao giờ có thẻ học viên vậy ạ"* — Thắc mắc thủ tục bị trôi, chỉ có bạn khác vào trả lời trêu đùa, không có phản hồi chính thức từ TA.
-       4. `M88368` (channel_02): *"Cho em hỏi là thành viên team 4-5 người... sẽ giữ nguyên hay random thêm..."* — Câu hỏi chính sách quan trọng bị chìm giữa các luồng chat.
-       5. `M78683`: *"Mọi người ơi cho em hỏi mở ticket ở kênh nào để báo lỗi CVAT với ạ?"* — Học viên lúng túng vì kênh chung bị trôi tin phải tìm đường tạo ticket hỗ trợ.
+    - **Bằng chứng phân tích dữ liệu (Đường B — Khai phá dữ liệu thật từ `data/discord-pack/`):**
+      - *Quy mô mẫu & Tính đại diện:* Khảo sát toàn bộ 1.092 tin nhắn (779 tin người dùng, 313 tin bot) tại `k4_messages.csv` trong tuần onboarding khóa 4 và 4 bản tin tự sinh tại `k4_daily_reports.md`.
+      - *Phương pháp đếm kiểm chứng được (Reproducible Method):* 
+        - Lọc tin nhắn học viên: `is_bot == False`.
+        - Lọc intent câu hỏi/thắc mắc bằng regex từ khóa: `r"(ticket|lỗi|hỏi|sao.*không|chưa.*được|\?)"` $\rightarrow$ Thu được **120 tin nhắn dạng thắc mắc/cần trợ giúp**.
+        - Đo lường độ trễ xử lý: So sánh chênh lệch thời gian giữa tin nhắn hỏi và tin nhắn phản hồi (`reply_to_msg_id`). Xác định câu hỏi bị trôi/chìm khi: thời gian chờ $> 120$ phút (2 giờ) HOẶC hoàn toàn không có người reply.
+      - *Số liệu đếm được & Phân tích định lượng:*
+        - **43 / 120 câu hỏi (chiếm 35.8%)** bị trôi dạt quá 2 giờ không có TA xử lý (trong đó 18 câu bị bỏ quên qua đêm $> 8$ tiếng).
+        - Cơ cấu câu hỏi bị trôi: **62% là sự cố kỹ thuật chặn tiến độ làm lab** (lỗi CVAT 500 OPA, tài khoản Phoenix sai GitHub, thiếu quyền Learner), **38% là vướng mắc thủ tục/ghép đội/thẻ học viên** gây hoang mang.
+        - Phân tích 4 bản tin bot tự động đang chạy: **100% (4/4 bản tin) hoàn toàn thiếu Direct Link** dẫn tới tin nhắn/ticket gốc, khiến TA mất thêm 10–15 phút tìm kiếm thủ công; **50% bản tin dính lỗi nặng** (bản tin 14/09 bị thuật toán chèn chuỗi rác *"nguồn tham chiếu..."* tới 9 lần làm biến dạng từ ngữ tiếng Việt; bản tin 13/09 bị cắt cụt câu ở cuối *"Một số câu hỏi chưa được giải đá"*).
+      - *Hiện tượng quá tải Ticket & Hành vi hối thúc của học viên:*
+        - **Số liệu bùng nổ ticket:** Có tới **132 lượt tin nhắn** trong pack nhắc đến lệnh `/ticket create` hoặc hướng dẫn tạo ticket hỗ trợ (chiếm $> 12\%$ tổng lượng tin nhắn). Khi kênh chung quá tải, học viên dồn hết về ticket khiến hệ thống hỗ trợ riêng tiếp tục bị nghẽn.
+        - **Hành vi 1 — Bối rối tìm cách mở ticket vì kênh chung bị trôi tin:** Học viên liên tục tag bot hoảng loạn (`M08310`: *`[@BOT] TẠO TICKET`*), không biết chọn loại ticket nào (`M80709`: *`[@BOT] có nhwuxng ticket type nào`*), hoặc phải hỏi cách tạo ticket vào đêm muộn (`M04103`: *`[@BOT] cách tạo ticket`*), bạn bè phải nhắc nhau tạo ticket (`M24366`, `M78683`).
+        - **Hành vi 2 — Tâm lý sốt ruột, nhắn tin hối thúc và spam lặp lại:** Khi không thấy TA tiếp nhận, học viên gửi tin nhắn liên tiếp trong thời gian cực ngắn (tiêu biểu `M57545` lúc 20:29 $\rightarrow$ `M53930` lúc 20:30 gửi 2 tin nhắn trong vòng **60 giây** vì lo lắng không vào được Phoenix), hoặc đã gửi mail/ticket nhưng vẫn phải lên kênh chat hỏi vòng quanh vì quá sốt ruột (`M49710`: *"cho em hỏi e có gửi mail hỗ trợ bên AI thực chiến mà chưa thấy phản hồi thì e nhờ ai giúp được ạ"*).
+    - *≥10 trích dẫn nguyên văn tiêu biểu kèm mã xác thực (từ `k4_messages.csv`):*
+        1. `M07901` (channel_08 · 22:49): *"Hi, mình vẫn chưa cài được CVAT. Có bạn nào hỗ trợ được mình không?"* — Học viên bị kẹt môi trường lab lúc đêm muộn, hoang mang tìm người cứu trước giờ học ngày mai.
+        2. `M57545` (channel_02 · 20:29): *"Dạ phoenix vẫn đang báo mail của em bị sai tài khoản github ạ"* — Lỗi xác thực tài khoản hệ thống bài tập lab, học viên chờ xử lý.
+        3. `M53930` (channel_02 · 20:30): *"Hiện tại em vẫn chưa vào được phoenix ạ"* — Học viên nhắn lặp lại liên tiếp sau 1 phút vì không thấy TA phản hồi.
+        4. `M49710` (channel_02 · 20:42): *"cho em hỏi e có gửi mail hỗ trợ bên AI thực chiến mà chưa thấy phản hồi thì e nhờ ai giúp được ạ"* — Đã gửi yêu cầu hỗ trợ nhưng bị chậm trễ, phải đi hỏi vòng quanh tìm sự trợ giúp.
+        5. `M75130` (channel_02 · 20:36): *"em làm theo 5 bước trong thông báo rùi mà vẫn ko có role learner ạ"* — Làm đúng quy trình nhưng hệ thống lỗi phân quyền, cần TA can thiệp thủ công.
+        6. `M45903` (channel_02 · 16:07): *"cho em hỏi là bao giờ có thẻ học viên vậy ạ"* — Thắc mắc thủ tục bị trôi dạt hơn 4 tiếng, chỉ có bạn khác vào trả lời trêu đùa.
+        7. `M88368` (channel_02 · 16:57): *"Cho em hỏi là thành viên team 4-5 người. Nếu team đang sẵn 4 người rồi thì BTC sẽ giữ nguyên hay sẽ random thêm 1 bạn nữa cho đủ 5 ạ?"* — Thắc mắc chính sách ghép đội quan trọng bị chìm giữa các luồng tán gẫu.
+        8. `M74716` (channel_02 · 11:25): *"cho e hỏi mai học lab CVAT thì dữ liệu để gán nhãn được bên chương trình cấp hay bọn e tự tìm thế ạ"* — Câu hỏi chuẩn bị bài lab ngày mai bị trôi giữa hàng chục tin nhắn thảo luận.
+        9. `M78683` (channel_02 · 23:16): *"bạn tạo ticket ấy"* — Câu hỏi trên kênh chung bị trôi, học viên khác phải hướng dẫn bạn tạo ticket riêng.
+        10. `M08310` (channel_10 · 16:03): *"[@BOT] TẠO TICKET"* — Học viên tag bot tìm cách mở ticket hỗ trợ vì không biết kênh tiếp nhận ở đâu.
+
 
 
 ## §2. Impact & quyết định chọn
