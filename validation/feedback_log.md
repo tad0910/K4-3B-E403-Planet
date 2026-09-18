@@ -32,7 +32,7 @@
 | Vấn đề | Quan sát | Yêu cầu cải thiện |
 |---|---|---|
 | Cảnh báo khó hiểu | Nhãn `MISS`, `CVAT` và các loại lỗi chưa nói rõ ý nghĩa | Hiển thị mô tả, điều kiện kích hoạt và hành động tiếp theo |
-| Phân loại chưa đúng nơi xử lý | Category hiện tại chưa tách nơi chịu trách nhiệm khỏi người trả lời | Thêm `target_role` hoặc `target_team`, ví dụ hư dụng cụ -> phụ trách dụng cụ/phòng lab |
+| Phân loại chưa đúng nơi xử lý | Category hiện tại chưa tách nơi chịu trách nhiệm khỏi người trả lời | Thêm `target_role` hoặc `target_team`|
 | Khó xem việc khẩn | Chỉ có danh sách/bộ lọc, chưa có bản tổng hợp duy nhất | Thêm `/urgent-digest` để gom toàn bộ ticket cần ưu tiên |
 
 ## Thay đổi sản phẩm từ feedback
