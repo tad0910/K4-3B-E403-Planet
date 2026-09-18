@@ -6,19 +6,33 @@ export default function TicketCard({ ticket, onOpenModal, onResolve, onOpenOrigi
   let borderColor = 'var(--accent-blurple)';
   let tagBg = 'rgba(88, 101, 242, 0.15)';
   let tagColor = 'var(--accent-blurple)';
+  let cleanStatusTag = ticket.statusTag;
 
   if (ticket.statusType === 'urgent') {
     borderColor = 'var(--danger-red)';
     tagBg = 'rgba(242, 63, 67, 0.15)';
     tagColor = 'var(--danger-red)';
+    cleanStatusTag = `🚨 BỎ SÓT >2H (${ticket.timeElapsed})`;
   } else if (ticket.statusType === 'warning') {
     borderColor = 'var(--warning-yellow)';
     tagBg = 'rgba(240, 178, 50, 0.15)';
     tagColor = 'var(--warning-yellow)';
+    cleanStatusTag = `🟡 CẦN CHÚ Ý (${ticket.timeElapsed})`;
   } else if (ticket.statusType === 'new') {
     borderColor = 'var(--success-green)';
     tagBg = 'rgba(35, 165, 90, 0.15)';
     tagColor = 'var(--success-green)';
+    cleanStatusTag = `🟢 MỚI TẠO (${ticket.timeElapsed})`;
+  }
+
+  // Determine Assigned Role
+  let assignedRole = { label: '👨‍🏫 Lab Coach / TA Kỹ thuật', color: '#5865f2', bg: 'rgba(88, 101, 242, 0.15)' };
+  if (ticket.category === 'logistics' || ticket.requiresAdmin || ticket.studentQuestion?.toLowerCase().includes('sửa điểm') || ticket.studentQuestion?.toLowerCase().includes('phúc khảo') || ticket.studentQuestion?.toLowerCase().includes('xin nghỉ')) {
+    assignedRole = { label: '🏛️ Ban Tổ Chức / Admin Lớp', color: '#ff9800', bg: 'rgba(255, 152, 0, 0.15)' };
+  } else if (ticket.studentQuestion?.toLowerCase().includes('chuột') || ticket.studentQuestion?.toLowerCase().includes('bàn phím') || ticket.studentQuestion?.toLowerCase().includes('mạng lan')) {
+    assignedRole = { label: '🔧 Kỹ thuật Phòng máy', color: '#00bcd4', bg: 'rgba(0, 188, 212, 0.15)' };
+  } else if (ticket.category === 'prompt' && ticket.statusType !== 'urgent') {
+    assignedRole = { label: '👥 Học viên hỗ trợ / FAQ', color: '#23a55a', bg: 'rgba(35, 165, 90, 0.15)' };
   }
 
   return (
@@ -32,7 +46,11 @@ export default function TicketCard({ ticket, onOpenModal, onResolve, onOpenOrigi
 
           <div style={styles.tagPillContainer}>
             <span style={{ ...styles.tagPill, backgroundColor: tagBg, color: tagColor }}>
-              {ticket.statusTag}
+              {cleanStatusTag}
+            </span>
+            {/* Assigned Role Badge */}
+            <span style={{ ...styles.roleBadge, backgroundColor: assignedRole.bg, color: assignedRole.color }}>
+              Gửi tới: <strong>{assignedRole.label}</strong>
             </span>
             <span style={styles.ticketId}>{ticket.id}</span>
           </div>
@@ -40,7 +58,7 @@ export default function TicketCard({ ticket, onOpenModal, onResolve, onOpenOrigi
 
         <div style={styles.timeBadge}>
           <span style={styles.timeDot}>🔴</span>
-          <span>{ticket.timeElapsed}</span>
+          <span>Chờ: {ticket.timeElapsed}</span>
         </div>
       </div>
 
@@ -64,13 +82,13 @@ export default function TicketCard({ ticket, onOpenModal, onResolve, onOpenOrigi
         <div style={styles.aiHeaderGroup}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
             <Bot size={16} color="#5865f2" />
-            <span style={styles.aiTitle}>AI Tóm tắt & Đề xuất cho TA</span>
+            <span style={styles.aiTitle}>AI Tóm tắt & Đề xuất hành động</span>
           </div>
 
           {ticket.isAnalyzed ? (
             <div style={styles.liveAiBadge}>
               <span style={styles.liveDot}></span>
-              <span>Live AI ({ticket.aiModel || 'gpt-4o-mini'} · {ticket.aiLatency || '3.2s'})</span>
+              <span>Live AI ({ticket.aiModel || 'gpt-4o-mini'} · {ticket.aiLatency || '1.4s'})</span>
             </div>
           ) : (
             <span style={styles.pendingBadge}>Chờ AI phân tích</span>
@@ -83,22 +101,22 @@ export default function TicketCard({ ticket, onOpenModal, onResolve, onOpenOrigi
 
         <div style={styles.aiActionRow}>
           <Star size={14} color="#f0b232" style={{ flexShrink: 0 }} />
-          <span style={styles.aiActionLabel}>Hành động gợi ý cho TA:</span>
+          <span style={styles.aiActionLabel}>Gợi ý xử lý:</span>
           <span style={styles.aiActionVal}>{ticket.aiSuggestedAction}</span>
         </div>
 
         {/* Source Citation Badge */}
         <div style={styles.sourcePill}>
           <Puzzle size={12} color="#8b5cf6" />
-          <span>{ticket.sourceCitation || 'Trích từ: Discord Live Data'}</span>
+          <span>{ticket.sourceCitation || 'Trích từ: Discord K4 Live Data'}</span>
         </div>
       </div>
 
       {/* Bottom Actions Bar */}
       <div style={styles.actionsRow}>
-        <button style={styles.btnOutline} onClick={() => onOpenOriginal(ticket)}>
+        <button style={styles.btnDirect} onClick={() => onOpenOriginal(ticket)}>
           <ExternalLink size={14} />
-          <span>Mở ticket gốc</span>
+          <span>🔗 Mở trực tiếp trên Discord</span>
         </button>
 
         <button style={styles.btnOutline} onClick={() => onOpenModal(ticket)}>
@@ -152,7 +170,8 @@ const styles = {
   tagPillContainer: {
     display: 'flex',
     alignItems: 'center',
-    gap: '8px'
+    gap: '8px',
+    flexWrap: 'wrap'
   },
   tagPill: {
     fontSize: '11px',
@@ -160,6 +179,14 @@ const styles = {
     padding: '4px 10px',
     borderRadius: '12px',
     letterSpacing: '0.2px'
+  },
+  roleBadge: {
+    fontSize: '11px',
+    padding: '4px 9px',
+    borderRadius: '12px',
+    display: 'inline-flex',
+    alignItems: 'center',
+    gap: '4px'
   },
   ticketId: {
     fontSize: '12px',
@@ -287,6 +314,20 @@ const styles = {
     alignItems: 'center',
     gap: '10px',
     paddingTop: '6px'
+  },
+  btnDirect: {
+    backgroundColor: 'rgba(88, 101, 242, 0.2)',
+    color: '#a5b4fc',
+    border: '1px solid rgba(88, 101, 242, 0.4)',
+    padding: '8px 14px',
+    borderRadius: '6px',
+    fontSize: '13px',
+    fontWeight: '700',
+    cursor: 'pointer',
+    display: 'inline-flex',
+    alignItems: 'center',
+    gap: '6px',
+    transition: 'all 0.15s ease'
   },
   btnOutline: {
     backgroundColor: '#383a40',

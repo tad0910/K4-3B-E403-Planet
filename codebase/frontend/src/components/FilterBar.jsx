@@ -1,12 +1,12 @@
 import React from 'react';
-import { RotateCcw } from 'lucide-react';
+import { RotateCcw, Zap, Sparkles } from 'lucide-react';
 
-export default function FilterBar({ activeCategory, onSelectCategory, onTriggerScan, countMap }) {
+export default function FilterBar({ activeCategory, onSelectCategory, onTriggerScan, onOpenDigest, countMap = {} }) {
   const filters = [
-    { id: 'all', label: `Tất cả (${countMap.all || 4})` },
-    { id: 'urgent', label: 'Cảnh báo MISS (>2h)' },
-    { id: 'cvat', label: 'Lỗi CVAT / Môi trường' },
-    { id: 'logistics', label: 'Logistics / Deadline' }
+    { id: 'all', label: `Tất cả (${countMap.all || 0})` },
+    { id: 'urgent', label: `🚨 Cần cứu gấp >2h (${countMap.urgent || 0})` },
+    { id: 'cvat', label: `🛠️ Việc của Lab Coach (${countMap.coach || 0})` },
+    { id: 'logistics', label: `🏛️ Chuyển BTC/Admin (${countMap.admin || 0})` }
   ];
 
   return (
@@ -29,10 +29,17 @@ export default function FilterBar({ activeCategory, onSelectCategory, onTriggerS
         })}
       </div>
 
-      <button style={styles.triggerBtn} onClick={onTriggerScan}>
-        <RotateCcw size={15} color="#ffffff" />
-        <span>Quét lại ngay (Kích hoạt AI)</span>
-      </button>
+      <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+        <button style={styles.digestBtn} onClick={onOpenDigest}>
+          <Zap size={15} color="#ffd700" />
+          <span>⚡ Bản tin Tóm tắt (/digest)</span>
+        </button>
+
+        <button style={styles.triggerBtn} onClick={onTriggerScan}>
+          <RotateCcw size={14} color="#ffffff" />
+          <span>Quét lại AI</span>
+        </button>
+      </div>
     </div>
   );
 }
@@ -55,7 +62,7 @@ const styles = {
     gap: '8px'
   },
   filterBtn: {
-    background: '#383a40',
+    backgroundColor: '#383a40',
     border: 'none',
     color: 'var(--text-secondary)',
     padding: '7px 16px',
@@ -63,24 +70,40 @@ const styles = {
     fontSize: '13px',
     fontWeight: '600',
     cursor: 'pointer',
+    outline: 'none',
     transition: 'all 0.15s ease'
   },
   activeBtn: {
     backgroundColor: 'var(--accent-blurple)',
     color: '#ffffff'
   },
-  triggerBtn: {
-    background: 'linear-gradient(135deg, #5865f2 0%, #4752c4 100%)',
+  digestBtn: {
+    background: 'linear-gradient(135deg, #7c3aed 0%, #d97706 100%)',
     color: '#ffffff',
     border: 'none',
-    padding: '9px 18px',
+    padding: '8px 16px',
     borderRadius: '8px',
     fontWeight: '700',
     fontSize: '13px',
     cursor: 'pointer',
     display: 'inline-flex',
     alignItems: 'center',
-    gap: '8px',
+    gap: '6px',
+    boxShadow: '0 4px 12px rgba(124, 58, 237, 0.35)',
+    transition: 'transform 0.15s ease'
+  },
+  triggerBtn: {
+    background: 'linear-gradient(135deg, #5865f2 0%, #4752c4 100%)',
+    color: '#ffffff',
+    border: 'none',
+    padding: '8px 14px',
+    borderRadius: '8px',
+    fontWeight: '700',
+    fontSize: '13px',
+    cursor: 'pointer',
+    display: 'inline-flex',
+    alignItems: 'center',
+    gap: '6px',
     boxShadow: '0 4px 14px rgba(88, 101, 242, 0.35)',
     transition: 'transform 0.15s ease'
   }
