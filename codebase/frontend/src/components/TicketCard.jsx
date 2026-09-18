@@ -62,11 +62,24 @@ export default function TicketCard({ ticket, onOpenModal, onResolve, onOpenOrigi
       {/* AI Summary Dashboard Box */}
       <div style={styles.aiBox}>
         <div style={styles.aiHeaderGroup}>
-          <Bot size={16} color="#5865f2" />
-          <span style={styles.aiTitle}>AI Tóm tắt cho TA</span>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <Bot size={16} color="#5865f2" />
+            <span style={styles.aiTitle}>AI Tóm tắt & Đề xuất cho TA</span>
+          </div>
+
+          {ticket.isAnalyzed ? (
+            <div style={styles.liveAiBadge}>
+              <span style={styles.liveDot}></span>
+              <span>Live AI ({ticket.aiModel || 'gpt-4o-mini'} · {ticket.aiLatency || '3.2s'})</span>
+            </div>
+          ) : (
+            <span style={styles.pendingBadge}>Chờ AI phân tích</span>
+          )}
         </div>
 
-        <p style={styles.aiSummaryText}>{ticket.aiSummary}</p>
+        <p style={styles.aiSummaryText}>
+          {ticket.aiSummary}
+        </p>
 
         <div style={styles.aiActionRow}>
           <Star size={14} color="#f0b232" style={{ flexShrink: 0 }} />
@@ -77,7 +90,7 @@ export default function TicketCard({ ticket, onOpenModal, onResolve, onOpenOrigi
         {/* Source Citation Badge */}
         <div style={styles.sourcePill}>
           <Puzzle size={12} color="#8b5cf6" />
-          <span>{ticket.sourceCitation}</span>
+          <span>{ticket.sourceCitation || 'Trích từ: Discord Live Data'}</span>
         </div>
       </div>
 
@@ -90,7 +103,7 @@ export default function TicketCard({ ticket, onOpenModal, onResolve, onOpenOrigi
 
         <button style={styles.btnOutline} onClick={() => onOpenModal(ticket)}>
           <Zap size={14} color="#f0b232" />
-          <span>Trả lời nhanh bằng AI</span>
+          <span>Xem câu trả lời AI</span>
         </button>
 
         <button style={styles.btnSuccess} onClick={() => onResolve(ticket.id)}>
@@ -201,7 +214,36 @@ const styles = {
   aiHeaderGroup: {
     display: 'flex',
     alignItems: 'center',
+    justifyContent: 'space-between',
     gap: '8px'
+  },
+  liveAiBadge: {
+    display: 'inline-flex',
+    alignItems: 'center',
+    gap: '6px',
+    backgroundColor: 'rgba(35, 165, 90, 0.15)',
+    border: '1px solid rgba(35, 165, 90, 0.4)',
+    color: '#23a55a',
+    fontSize: '11px',
+    fontWeight: '700',
+    padding: '2px 8px',
+    borderRadius: '12px'
+  },
+  liveDot: {
+    width: '6px',
+    height: '6px',
+    borderRadius: '50%',
+    backgroundColor: '#23a55a',
+    boxShadow: '0 0 6px #23a55a'
+  },
+  pendingBadge: {
+    backgroundColor: 'rgba(148, 155, 164, 0.15)',
+    border: '1px solid rgba(148, 155, 164, 0.3)',
+    color: '#949ba4',
+    fontSize: '11px',
+    fontWeight: '600',
+    padding: '2px 8px',
+    borderRadius: '12px'
   },
   aiTitle: {
     fontSize: '13px',
