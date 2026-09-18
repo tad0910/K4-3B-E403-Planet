@@ -21,7 +21,7 @@ if str(ROOT_DIR) not in sys.path:
     sys.path.insert(0, str(ROOT_DIR))
 
 from codebase.env_loader import load_dotenv
-from codebase.providers import get_provider
+from codebase.providers import get_provider, get_available_providers
 
 # Nạp file .env
 load_dotenv(ROOT_DIR / ".env")
@@ -40,9 +40,10 @@ def get_system_prompt() -> str:
 def classify_ticket(ticket: dict) -> dict:
     """
     Nhận vào 1 Ticket dict và gọi mô hình AI phân loại.
-    Tự động sử dụng provider được cấu hình trong .env.
+    Hỗ trợ cơ chế Fallback tự động: nếu provider số 1 gặp lỗi (hết quota, timeout...),
+    hệ thống sẽ tự động chuyển sang provider tiếp theo trong danh sách.
     """
-    provider_name, model_name, provider = get_provider()
+    providers = get_available_providers()
     system_prompt = get_system_prompt()
 
     user_content = f"""MÃ TICKET: {ticket.get('ticket_id', 'Unknown')}
@@ -52,15 +53,27 @@ THỜI GIAN CHỜ: {ticket.get('wait_time_minutes', 0)} phút
 NỘI DUNG CHI TIẾT:
 {ticket.get('content', '')}"""
 
-    start_time = time.time()
-    result = provider.generate_json(system_prompt, user_content)
-    elapsed = round(time.time() - start_time, 2)
+    errors: list[str] = []
+    for idx, (provider_name, model_name, provider) in enumerate(providers):
+        try:
+            start_time = time.time()
+            result = provider.generate_json(system_prompt, user_content)
+            elapsed = round(time.time() - start_time, 2)
 
-    result["latency_seconds"] = elapsed
-    result["provider_used"] = provider_name
-    result["model_used"] = model_name
-    result["ticket_id"] = ticket.get("ticket_id")
-    return result
+            result["latency_seconds"] = elapsed
+            result["provider_used"] = provider_name
+            result["model_used"] = model_name
+            result["ticket_id"] = ticket.get("ticket_id")
+            if idx > 0:
+                result["fallback_from"] = [p[0] for p in providers[:idx]]
+            return result
+        except Exception as exc:
+            err_msg = f"[{provider_name.upper()} - {model_name}] Lỗi: {exc}"
+            print(f"⚠️ Cảnh báo Fallback: {err_msg}. Đang thử provider tiếp theo...")
+            errors.append(err_msg)
+
+    # Nếu tất cả provider đều lỗi
+    raise RuntimeError(f"Tất cả LLM Providers đều thất bại:\n" + "\n".join(errors))
 
 
 if __name__ == "__main__":
